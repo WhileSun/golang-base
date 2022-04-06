@@ -1,0 +1,32 @@
+log:
+  type: file
+  stdout: true
+  LogLevel: 5
+redis:
+  password: 666666
+  server: 127.0.0.1:6379
+  maxActive: 20
+  maxIdle: 5
+database:
+  type: postgres
+  host: 127.0.0.1
+  port: 5432
+  user: postgres
+  password: lingweiqu
+  name: tshop_go
+  maxIdleConn: 5
+  maxOpenConn: 20
+  Log: true
+jwt:
+  secret: base_go_oms
+  exp: 3600
+casbin:
+  Prefix: r
+loginSetting:
+  tokenKey: token
+  sessionKey: user_session
+  sessionEx: 7200
+app:
+  initPwd: 123456
+  userSuperName: system
+  roleSuperName: super_admin
