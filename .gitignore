@@ -1,0 +1,8 @@
+.idea
+/tmp
+/test
+/trans
+/runtime
+/dist
+/uploads
+*.exe
