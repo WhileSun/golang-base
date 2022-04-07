@@ -17,4 +17,5 @@ type SMenu struct {
 	PagePerms string `json:"page_perms"`
 	Status    bool   `json:"status"`
 	Show      bool   `json:"show"`
+	IsSys     bool   `json:"is_sys"`
 }

@@ -70,6 +70,9 @@ func (s *MenuService) Update(params dto.UpdateMenu) error {
 	if oldMenuModel.Id == 0 {
 		return errors.New("需要更新的菜单栏目不存在，请确认！")
 	}
+	if oldMenuModel.IsSys{
+		return errors.New("系统默认栏目不支持修改！")
+	}
 	//生成参数model
 	menuModel := models.NewMenu()
 	gconvert.StructCopy(params, menuModel)
@@ -88,6 +91,13 @@ func (s *MenuService) Update(params dto.UpdateMenu) error {
 
 func (s *MenuService) Delete(params dto.DeleteMenu) error{
 	oldMenuModel := models.NewMenu()
+	oldMenuModel.GetRow(params.Id)
+	if oldMenuModel.Id == 0 {
+		return errors.New("需要删除的菜单栏目不存在，请确认！")
+	}
+	if oldMenuModel.IsSys{
+		return errors.New("系统默认栏目不支持修改！")
+	}
 	total := oldMenuModel.CheckChildrenExists(params.Id)
 	if total>0{
 		return errors.New("删除菜单目录失败，请先删除子目录！")

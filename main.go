@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/whilesun/go-admin/app/models"
 	"github.com/whilesun/go-admin/pkg/gvalidator"
 	"github.com/whilesun/go-admin/routers"
 	"net/http"
@@ -8,8 +9,8 @@ import (
 )
 
 func main() {
+	models.NewSysInit().Run()
 	gvalidator.InitGinValidate("zh")
-
 	router := routers.InitRouter()
 	s := &http.Server{
 		Addr:         ":3000",
