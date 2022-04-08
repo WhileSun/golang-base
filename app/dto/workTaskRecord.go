@@ -1,6 +1,6 @@
 package dto
 
-type AddTaskRecord struct {
+type AddWorkTaskRecord struct {
 	TaskProjectId int    `form:"task_project_id"  binding:"required" label:"项目ID"`
 	LaunchTimeStr string `form:"launch_time" binding:"required,datetime=2006-01-02 15:04:05" label:"发起时间"`
 	StartTimeStr  string `form:"start_time" binding:"omitempty,datetime=2006-01-02 15:04:05" label:"开始时间"`
@@ -13,7 +13,11 @@ type AddTaskRecord struct {
 	Remark        string `form:"remark" binding:"" label:"备注"`
 }
 
-type UpdateTaskRecord struct {
+type UpdateWorkTaskRecord struct {
 	Id int `form:"id"  binding:"required" label:"ID"`
-	AddTaskRecord
+	AddWorkTaskRecord
+}
+
+type DeleteWorkTaskRecord struct {
+	Id int `form:"id"  binding:"required" label:"ID"`
 }

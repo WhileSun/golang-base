@@ -67,7 +67,7 @@ func (m *SysInit) Run() {
 }
 
 func initMenu(tx *gorm.DB) error {
-	systemModel := &SMenu{po.SMenu{MenuName: "系统管理", Url: "/system", Icon: "icon-xitong", ParentId: 0, Sort: 1, MenuType: 1, Status: true, Show: true, IsSys: true}}
+	systemModel := &SMenu{po.SMenu{MenuName: "系统管理", Url: "/system", Icon: "icon-xitong", ParentId: 0, Sort: 100, MenuType: 1, Status: true, Show: true, IsSys: true}}
 	if err := tx.Create(&systemModel).Error; err != nil {
 		return err
 	}

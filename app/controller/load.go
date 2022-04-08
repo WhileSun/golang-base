@@ -23,3 +23,8 @@ func (c *LoadController) GetMenuList(req *gin.Context){
 	rows := models.NewMenu().GetFieldList(req)
 	e.New(req).Data(e.SUCCESS, rows)
 }
+
+func (c *LoadController) GetWorkTaskProjectList(req *gin.Context){
+	rows := models.NewWorkTaskProject().GetFieldList()
+	e.New(req).Data(e.SUCCESS, rows)
+}

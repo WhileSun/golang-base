@@ -30,10 +30,12 @@ func InitRouter() *gin.Engine {
 		api.POST("/user/passwd/update", (&controller.UserController{}).UpdatePasswd)
 		api.GET("/user/info/get", (&controller.UserController{}).GetUserId)
 		api.POST("/user/routes/get", (&controller.UserController{}).GetUserRoutes)
-
-		api.POST("load/role/list/get",(&controller.LoadController{}).GetRoleList)
-		api.POST("load/menu/list/get",(&controller.LoadController{}).GetMenuList)
-
+		load := api.Group("/load")
+		{
+			load.POST("/role/list/get", (&controller.LoadController{}).GetRoleList)
+			load.POST("/menu/list/get", (&controller.LoadController{}).GetMenuList)
+			load.POST("/work/taskProject/list/get", (&controller.LoadController{}).GetWorkTaskProjectList)
+		}
 		//以上接口不需要接口权限配置
 		api.Use(middleware.ReqAuth())
 
@@ -54,6 +56,18 @@ func InitRouter() *gin.Engine {
 			role.POST("/add",(&controller.RoleController{}).Add)
 			role.POST("/update",(&controller.RoleController{}).Update)
 			role.POST("/list/get",(&controller.RoleController{}).GetList)
+		}
+
+		work := api.Group("/work")
+		{
+			work.POST("/taskProject/list/get",(&controller.WorkTaskProjectController{}).GetList)
+			work.POST("/taskProject/add",(&controller.WorkTaskProjectController{}).Add)
+			work.POST("/taskProject/update",(&controller.WorkTaskProjectController{}).Update)
+
+			work.POST("/taskRecord/list/get",(&controller.WorkTaskRecordController{}).GetList)
+			work.POST("/taskRecord/add",(&controller.WorkTaskRecordController{}).Add)
+			work.POST("/taskRecord/update",(&controller.WorkTaskRecordController{}).Update)
+			work.POST("/taskRecord/delete",(&controller.WorkTaskRecordController{}).Delete)
 		}
 	}
 	return r
