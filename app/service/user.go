@@ -102,6 +102,8 @@ func (s *UserService) Update(params dto.UpdateUser) error {
 		if !ok {
 			return errors.New("修改用户角色失败！")
 		}
+		//删除用户角色redis缓存
+		NewUserAuth().DelRoles(userModel.Id)
 		return nil
 	})
 	if err != nil {
@@ -130,9 +132,9 @@ func (s *UserService) CheckLogin(params *dto.LoginUser) (string, uint) {
 	return token, e.SUCCESS
 }
 
-func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd,req *gin.Context) error{
+func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd, req *gin.Context) error {
 	ok := gtools.VerifyPasswdV4(params.NewPasswd)
-	if ok{
+	if ok {
 		userId := req.GetInt("userId")
 		userToken := req.GetString("userToken")
 		userModel := models.NewUser()
@@ -142,13 +144,13 @@ func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd,req *gin.Context)
 		}
 		userModel.Id = userId
 		userModel.Password = gcrypto.PwdEncode(params.NewPasswd)
-		err:=userModel.UpdatePasswd()
-		if err != nil{
+		err := userModel.UpdatePasswd()
+		if err != nil {
 			gsys.Logger.Error("更新用户新密码失败", err.Error())
 			return errors.New("更新用户新密码失败")
 		}
-		NewUserAuth().DelSession(userId,userToken)
-	}else{
+		NewUserAuth().DelSession(userId, userToken)
+	} else {
 		return errors.New("密码需要符合规则[大小写字母+数字+特殊符号+6位以上]")
 	}
 	return nil

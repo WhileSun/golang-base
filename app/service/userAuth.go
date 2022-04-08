@@ -85,7 +85,7 @@ func (s *UserAuthService) GetRoles(userId int) (int, []string) {
 		roles = models.NewUser().GetRoles(userId)
 		args := []interface{}{key}
 		for _, role := range roles {
-			args = append(args,role)
+			args = append(args, role)
 		}
 		redisConn.Do("SADD", args...)
 	} else {
@@ -96,20 +96,27 @@ func (s *UserAuthService) GetRoles(userId int) (int, []string) {
 	return isSuper, roles
 }
 
+func (s *UserAuthService) DelRoles(userId int) {
+	redisConn := gsys.Redis.Get()
+	defer redisConn.Close()
+	key := fmt.Sprintf("user_roles_%d", userId)
+	redisConn.Do("DEL", key)
+}
+
 //SetRolePerms 设置权限
-func (s *UserAuthService) SetRolePerms(roleIdentity string){
+func (s *UserAuthService) SetRolePerms(roleIdentity string) {
 	redisConn := gsys.Redis.Get()
 	defer redisConn.Close()
 	key := fmt.Sprintf("role_perms_%s", roleIdentity)
 	exists, _ := redis.Int(redisConn.Do("EXISTS", key))
-	if exists == 0{
+	if exists == 0 {
 		perms := models.NewRole().GetRolePerms(roleIdentity)
 		args := []interface{}{key}
-		if len(perms) == 0{
-			args = append(args,"")
-		}else{
+		if len(perms) == 0 {
+			args = append(args, "")
+		} else {
 			for _, perm := range perms {
-				args = append(args,perm)
+				args = append(args, perm)
 			}
 		}
 		redisConn.Do("SADD", args...)
@@ -131,9 +138,9 @@ func (s *UserAuthService) ExistsPerm(perm string, roles []string) bool {
 	return false
 }
 
-func (s *UserAuthService) DelRole(roleIdentity string){
+func (s *UserAuthService) DelRolePerms(roleIdentity string) {
 	redisConn := gsys.Redis.Get()
 	defer redisConn.Close()
-	key:=fmt.Sprintf("role_perms_%s", roleIdentity)
+	key := fmt.Sprintf("role_perms_%s", roleIdentity)
 	redisConn.Do("DEL", key)
 }

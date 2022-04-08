@@ -77,6 +77,6 @@ func (s *RoleService) Update(params dto.UpdateRole) error {
 		gsys.Logger.Error("编辑角色失败—>", err.Error())
 		return errors.New("更新角色失败！")
 	}
-	NewUserAuth().DelRole(odlRoleModel.RoleIdentity)
+	NewUserAuth().DelRolePerms(odlRoleModel.RoleIdentity)
 	return nil
 }

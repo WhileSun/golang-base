@@ -27,8 +27,8 @@ func (m *SMenu) Add() error {
 }
 
 func (m *SMenu) Update() error {
-	result := db.Model(m).Select("menu_name","menu_type","url","icon","parent_id",
-		"sort","data_perms","page_perms","status","show").Updates(m)
+	result := db.Model(m).Select("menu_name", "menu_type", "url", "icon", "parent_id",
+		"sort", "data_perms", "page_perms", "status", "show").Updates(m)
 	return result.Error
 }
 
@@ -38,51 +38,50 @@ func (m *SMenu) Delete() error {
 }
 
 //CheckChildrenExists 判断下面是否有子集
-func (m *SMenu) CheckChildrenExists(id int) int{
+func (m *SMenu) CheckChildrenExists(id int) int {
 	var total int
-	db.Model(&SMenu{}).Raw("SELECT count(id) as total FROM s_menu where parent_id = ?",id).Scan(&total)
+	db.Model(&SMenu{}).Raw("SELECT count(id) as total FROM s_menu where parent_id = ?", id).Scan(&total)
 	return total
 }
 
 //GetFieldList 获取菜单的字段列表
-func (m *SMenu) GetFieldList(req *gin.Context) []*vo.MenuFieldList{
-	menus := make([]*vo.MenuFieldList,0)
+func (m *SMenu) GetFieldList(req *gin.Context) []*vo.MenuFieldList {
+	menus := make([]*vo.MenuFieldList, 0)
 	menuType := gconvert.StrToInt(req.PostForm("menu_type"))
 	con := db.Model(&SMenu{})
-	if menuType>0 {
-		con = con.Where("menu_type = ?",menuType)
+	if menuType > 0 {
+		con = con.Where("menu_type = ?", menuType)
 	}
 	con.Order("sort asc,id asc").Scan(&menus)
 	return menus
 }
 
-func (m *SMenu) GetUserRoutesList(super bool, roles []string) []*SMenu{
+func (m *SMenu) GetUserRoutesList(super bool, roles []string) []*SMenu {
 	var menus []*SMenu
-	if super{
-		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? order by sort asc",true).Scan(&menus)
-	}else{
-		menuIds := make([]string,0)
-		db.Model(&SRole{}).Raw("select distinct regexp_split_to_table(perms_ids,',') as menu_ids from s_role where role_name in ? and status=?",roles,true).Scan(&menuIds)
-		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? and id in ? order by sort asc",true,menuIds).Scan(&menus)
+	if super {
+		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? order by sort asc", true).Scan(&menus)
+	} else {
+		menuIds := make([]string, 0)
+		db.Model(&SRole{}).Raw("select distinct regexp_split_to_table(perms_ids,',') as menu_ids from s_role where role_identity in ? and status=?", roles, true).Scan(&menuIds)
+		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? and id in ? order by sort asc", true, menuIds).Scan(&menus)
 	}
 	return menus
 }
 
-func (m *SMenu) GeDataPerms(ids []string) []map[string]interface{}{
-	resp := make([]map[string]interface{},0)
-	db.Model(&SMenu{}).Select("data_perms").Where("id in ?",ids).
-		Where("menu_type = ?",4).
-		Where("data_perms <> ?","").Find(&resp)
+func (m *SMenu) GeDataPerms(ids []string) []map[string]interface{} {
+	resp := make([]map[string]interface{}, 0)
+	db.Model(&SMenu{}).Select("data_perms").Where("id in ?", ids).
+		Where("menu_type = ?", 4).
+		Where("data_perms <> ?", "").Find(&resp)
 	return resp
 }
-
 
 func (m *SMenu) GetRow(id int) *SMenu {
 	db.Select("id,data_perms,status,menu_type").Where("id = ?", id).Find(m)
 	return m
 }
 
-func (m *SMenu) CheckDataPermsExist() int{
+func (m *SMenu) CheckDataPermsExist() int {
 	var id int
 	db.Model(&SMenu{}).Select("id").Where("data_perms = ?", m.DataPerms).Scan(&id)
 	return id

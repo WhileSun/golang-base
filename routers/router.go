@@ -11,15 +11,15 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Static("/static", "./dist/static")
 	r.Static("/uploads", "./uploads")
-	r.StaticFile("/", "dist/index.html")  //前端接口
+	r.StaticFile("/", "dist/index.html") //前端接口
 
-	r.POST("/test1",(&controller.IndexController{}).Test)
+	r.POST("/test1", (&controller.IndexController{}).Test)
 
 	//r.Use(middleware.Cors())
 	r.Use(middleware.LoggerToFile())
 	// 使用 Recovery 中间件
 	r.Use(gin.Recovery())
-	api:= r.Group("/api")
+	api := r.Group("/api")
 	{
 		api.GET("/sys/loginCaptcha/get", (&controller.SysController{}).GetLoginCaptcha)
 		api.POST("/user/login", (&controller.UserController{}).Login)
@@ -27,9 +27,9 @@ func InitRouter() *gin.Engine {
 		api.Use(middleware.LoginAuth())
 
 		api.POST("/user/outLogin", (&controller.UserController{}).OutLogin)
-		api.POST("/user/passwd/update", (&controller.UserController{}).UpdatePasswd)
 		api.GET("/user/info/get", (&controller.UserController{}).GetUserId)
 		api.POST("/user/routes/get", (&controller.UserController{}).GetUserRoutes)
+
 		load := api.Group("/load")
 		{
 			load.POST("/role/list/get", (&controller.LoadController{}).GetRoleList)
@@ -39,35 +39,39 @@ func InitRouter() *gin.Engine {
 		//以上接口不需要接口权限配置
 		api.Use(middleware.ReqAuth())
 
-		api.POST("/user/list/get",(&controller.UserController{}).GetList)
-		api.POST("/user/add",(&controller.UserController{}).Add)
-		api.POST("/user/update",(&controller.UserController{}).Update)
+		user := api.Group("/user")
+		{
+			user.POST("/list/get", (&controller.UserController{}).GetList)
+			user.POST("/add", (&controller.UserController{}).Add)
+			user.POST("/update", (&controller.UserController{}).Update)
+			user.POST("/passwd/update", (&controller.UserController{}).UpdatePasswd)
+		}
 
 		menu := api.Group("/menu")
 		{
-			menu.POST("/add",(&controller.MenuController{}).Add)
-			menu.POST("/update",(&controller.MenuController{}).Update)
-			menu.POST("/list/get",(&controller.MenuController{}).GetList)
-			menu.POST("/delete",(&controller.MenuController{}).Delete)
+			menu.POST("/add", (&controller.MenuController{}).Add)
+			menu.POST("/update", (&controller.MenuController{}).Update)
+			menu.POST("/list/get", (&controller.MenuController{}).GetList)
+			menu.POST("/delete", (&controller.MenuController{}).Delete)
 		}
 
 		role := api.Group("/role")
 		{
-			role.POST("/add",(&controller.RoleController{}).Add)
-			role.POST("/update",(&controller.RoleController{}).Update)
-			role.POST("/list/get",(&controller.RoleController{}).GetList)
+			role.POST("/add", (&controller.RoleController{}).Add)
+			role.POST("/update", (&controller.RoleController{}).Update)
+			role.POST("/list/get", (&controller.RoleController{}).GetList)
 		}
 
 		work := api.Group("/work")
 		{
-			work.POST("/taskProject/list/get",(&controller.WorkTaskProjectController{}).GetList)
-			work.POST("/taskProject/add",(&controller.WorkTaskProjectController{}).Add)
-			work.POST("/taskProject/update",(&controller.WorkTaskProjectController{}).Update)
+			work.POST("/taskProject/list/get", (&controller.WorkTaskProjectController{}).GetList)
+			work.POST("/taskProject/add", (&controller.WorkTaskProjectController{}).Add)
+			work.POST("/taskProject/update", (&controller.WorkTaskProjectController{}).Update)
 
-			work.POST("/taskRecord/list/get",(&controller.WorkTaskRecordController{}).GetList)
-			work.POST("/taskRecord/add",(&controller.WorkTaskRecordController{}).Add)
-			work.POST("/taskRecord/update",(&controller.WorkTaskRecordController{}).Update)
-			work.POST("/taskRecord/delete",(&controller.WorkTaskRecordController{}).Delete)
+			work.POST("/taskRecord/list/get", (&controller.WorkTaskRecordController{}).GetList)
+			work.POST("/taskRecord/add", (&controller.WorkTaskRecordController{}).Add)
+			work.POST("/taskRecord/update", (&controller.WorkTaskRecordController{}).Update)
+			work.POST("/taskRecord/delete", (&controller.WorkTaskRecordController{}).Delete)
 		}
 	}
 	return r
