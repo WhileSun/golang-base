@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
 		api.Use(middleware.LoginAuth())
 
 		api.POST("/user/outLogin", (&controller.UserController{}).OutLogin)
+		api.POST("/user/passwd/update", (&controller.UserController{}).UpdatePasswd)
 		api.GET("/user/info/get", (&controller.UserController{}).GetUserId)
 		api.POST("/user/routes/get", (&controller.UserController{}).GetUserRoutes)
 

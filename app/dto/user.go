@@ -18,3 +18,8 @@ type LoginUser struct {
 	CaptchaId string `form:"captcha_id" binding:"required" label:"验证码ID"`
 	Captcha   string `form:"captcha" binding:"required" label:"验证码"`
 }
+
+type UpdateUserPasswd struct {
+	OldPasswd string `form:"old_passwd" binding:"required"  label:"旧密码"`
+	NewPasswd string `form:"new_passwd" binding:"required"  label:"新密码"`
+}

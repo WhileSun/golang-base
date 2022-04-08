@@ -23,6 +23,16 @@ func (m *SUser) CheckExist(username string, password string) *SUser {
 	return m
 }
 
+func (m *SUser) GetPasswd(userId int) string{
+	var password string
+	db.Model(&SUser{}).Select("password").Where("id=?",userId).Scan(&password)
+	return password
+}
+
+func (m *SUser) UpdatePasswd() error{
+	return db.Model(m).Select("password").Updates(m).Error
+}
+
 func (m *SUser) GetInfo(id int) *SUser {
 	db.Select("id,username,realname").Where("id = ?", id).Find(m)
 	return m

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/whilesun/go-admin/app/po"
 	"github.com/whilesun/go-admin/app/vo"
@@ -57,14 +56,15 @@ func (m *SMenu) GetFieldList(req *gin.Context) []*vo.MenuFieldList{
 	return menus
 }
 
-func (m *SMenu) GetUserRoutesList(super bool,permsIdArr []string) []*SMenu{
+func (m *SMenu) GetUserRoutesList(super bool, roles []string) []*SMenu{
 	var menus []*SMenu
-	newBb := db.Debug()
-	if !super{
-		fmt.Println(super,permsIdArr)
-		newBb = newBb.Where("id in ?",permsIdArr)
+	if super{
+		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? order by sort asc",true).Scan(&menus)
+	}else{
+		menuIds := make([]string,0)
+		db.Model(&SRole{}).Raw("select distinct regexp_split_to_table(perms_ids,',') as menu_ids from s_role where role_name in ? and status=?",roles,true).Scan(&menuIds)
+		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? and id in ? order by sort asc",true,menuIds).Scan(&menus)
 	}
-	newBb.Where("status = ?",true).Order("sort asc").Find(&menus)
 	return menus
 }
 

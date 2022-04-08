@@ -114,10 +114,10 @@ func (s *MenuService) Delete(params dto.DeleteMenu) error{
 
 
 //GetUserRoutes 获取用户菜单栏权限
-func (s *MenuService) GetUserRoutes(username string) []*MenuRoutesResult {
+func (s *MenuService) GetUserRoutes(userId int) []*MenuRoutesResult {
 	menuModel := models.NewMenu()
-	//super, permsIdArr := models.NewRolePolicy().GetUserRolesPerms(username)
-	rows := menuModel.GetUserRoutesList(true, []string{})
+	isSuper, roles := NewUserAuth().GetRoles(userId)
+	rows := menuModel.GetUserRoutesList(isSuper==1, roles)
 	menuRoutes := make([]*MenuRoutesResult, 0)
 	menuRoutes = UserRoutesTrans(rows, 0, menuRoutes)
 	return menuRoutes
@@ -126,26 +126,23 @@ func (s *MenuService) GetUserRoutes(username string) []*MenuRoutesResult {
 func UserRoutesTrans(rows []*models.SMenu, parentId int, menuRoutes []*MenuRoutesResult) []*MenuRoutesResult {
 	for _, row := range rows {
 		if row.ParentId == parentId {
-			// MenuType 1,2为目录和菜单
-			if row.MenuType < 3 {
+			if row.MenuType ==1 {
 				tMenuRoutes := &MenuRoutesResult{}
 				tMenuRoutes.Path = row.Url
 				tMenuRoutes.Name = row.MenuName
 				tMenuRoutes.Icon = row.Icon
-				if row.MenuType == 2 {
-					PagePerms := make([]string, 0)
-					for _, subRow := range rows {
-						if row.Id == subRow.ParentId {
-							PagePerms = append(PagePerms, subRow.PagePerms)
-						}
+				PagePerms := make([]string, 0)
+				for _, subRow := range rows {
+					if row.Id == subRow.ParentId && subRow.MenuType==2{
+						PagePerms = append(PagePerms, subRow.PagePerms)
 					}
-					tMenuRoutes.PagePerms = PagePerms
 				}
+				tMenuRoutes.PagePerms = PagePerms
 				subMenuRoutes := UserRoutesTrans(rows, row.Id, tMenuRoutes.Routes)
 				//如果是目录，默认添加一个redirect
 				if row.MenuType == 1 && len(subMenuRoutes) > 0 {
 					tMenuRoutes.Routes = subMenuRoutes
-					tMenuRoutes.Routes = append(tMenuRoutes.Routes, &MenuRoutesResult{Path: row.Url, Redirect: subMenuRoutes[0].Path})
+					//tMenuRoutes.Routes = append(tMenuRoutes.Routes, &MenuRoutesResult{Path: row.Url, Redirect: subMenuRoutes[0].Path})
 				}
 				menuRoutes = append(menuRoutes, tMenuRoutes)
 			}

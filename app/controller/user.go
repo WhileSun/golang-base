@@ -40,6 +40,12 @@ func (c *UserController) OutLogin(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
+func (c *UserController) GetList(req *gin.Context) {
+	userModel := models.NewUser()
+	rows := userModel.GetList(req)
+	e.New(req).Data(e.SUCCESS, rows)
+}
+
 func (c *UserController) Add(req *gin.Context) {
 	var params dto.AddUser
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
@@ -72,6 +78,22 @@ func (c *UserController) Update(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
+func (c *UserController) UpdatePasswd(req *gin.Context){
+	var params dto.UpdateUserPasswd
+	if err := gvalidator.ReqValidate(req, &params); err != nil {
+		gsys.Logger.Info("修改用户密码参数有误->", err.Error())
+		e.New(req).Msg(e.ERROR_API_PARAMS)
+		return
+	}
+	userService := service.NewUser()
+	err := userService.UpdatePasswd(params,req)
+	if err != nil {
+		e.New(req).MsgDetail(e.FAILED, err.Error())
+		return
+	}
+	e.New(req).Msg(e.SUCCESS)
+}
+
 func (c *UserController) GetUserId(req *gin.Context) {
 	userId := req.GetInt("userId")
 	userModel := models.NewUser()
@@ -82,13 +104,9 @@ func (c *UserController) GetUserId(req *gin.Context) {
 //GetUserRoutes 获取用户开放的路由权限
 func (c *UserController) GetUserRoutes(req *gin.Context) {
 	menuService := service.NewMenu()
-	rows := menuService.GetUserRoutes(req.GetString("username"))
+	rows := menuService.GetUserRoutes(req.GetInt("userId"))
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *UserController) GetList(req *gin.Context) {
-	userModel := models.NewUser()
-	rows := userModel.GetList(req)
-	e.New(req).Data(e.SUCCESS, rows)
-}
+
 

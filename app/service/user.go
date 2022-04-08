@@ -3,9 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/whilesun/go-admin/app/dto"
 	"github.com/whilesun/go-admin/app/models"
 	"github.com/whilesun/go-admin/pkg/e"
+	"github.com/whilesun/go-admin/pkg/gcaptcha"
 	"github.com/whilesun/go-admin/pkg/gconf"
 	"github.com/whilesun/go-admin/pkg/gcrypto"
 	"github.com/whilesun/go-admin/pkg/gsys"
@@ -110,9 +112,9 @@ func (s *UserService) Update(params dto.UpdateUser) error {
 
 //CheckLogin 监测用户登录
 func (s *UserService) CheckLogin(params *dto.LoginUser) (string, uint) {
-	//if gcaptcha.Verify(params.CaptchaId, params.Captcha) == false {
-	//	return "", e.ERROR_CAPTCHA_VERIFY
-	//}
+	if gcaptcha.Verify(params.CaptchaId, params.Captcha) == false {
+		return "", e.ERROR_CAPTCHA_VERIFY
+	}
 	pwd := gcrypto.PwdEncode(params.Password)
 	user := models.NewUser().CheckExist(params.Username, pwd)
 	if user.Id == 0 {
@@ -128,6 +130,26 @@ func (s *UserService) CheckLogin(params *dto.LoginUser) (string, uint) {
 	return token, e.SUCCESS
 }
 
-func (s *UserService) GetPermIds(){
-
+func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd,req *gin.Context) error{
+	ok := gtools.VerifyPasswdV4(params.NewPasswd)
+	if ok{
+		userId := req.GetInt("userId")
+		userToken := req.GetString("userToken")
+		userModel := models.NewUser()
+		oldPasswd := userModel.GetPasswd(userId)
+		if gcrypto.PwdEncode(params.OldPasswd) != oldPasswd {
+			return errors.New("旧密码不正确，请重新输入")
+		}
+		userModel.Id = userId
+		userModel.Password = gcrypto.PwdEncode(params.NewPasswd)
+		err:=userModel.UpdatePasswd()
+		if err != nil{
+			gsys.Logger.Error("更新用户新密码失败", err.Error())
+			return errors.New("更新用户新密码失败")
+		}
+		NewUserAuth().DelSession(userId,userToken)
+	}else{
+		return errors.New("密码需要符合规则[大小写字母+数字+特殊符号+6位以上]")
+	}
+	return nil
 }
