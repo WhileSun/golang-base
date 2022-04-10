@@ -51,6 +51,7 @@ func initLog() *logrus.Logger {
 	//logger标准化日志
 	if logConfig.Stdout == true {
 		logger.SetFormatter(new(LogFormatter))
+		logger.SetOutput(os.Stdout)
 		return logger
 	}
 	//判断日志类型

@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/whilesun/go-admin/pkg/gsys"
 	"time"
 )
 
@@ -25,20 +25,20 @@ func LoggerToFile() gin.HandlerFunc {
 		statusCode := c.Writer.Status()
 		// 请求IP
 		clientIP := c.ClientIP()
-		fmt.Printf("| %3d | %13v | %15s | %s | %s |\r\n",
-			statusCode,
-			latencyTime,
-			clientIP,
-			reqMethod,
-			reqUri)
-		// 日志格式
-		//gsys.Logger.Infof("| %3d | %13v | %15s | %s | %s |",
+		//fmt.Printf("| %3d | %13v | %15s | %s | %s |\r\n",
 		//	statusCode,
 		//	latencyTime,
 		//	clientIP,
 		//	reqMethod,
-		//	reqUri,
-		//)
+		//	reqUri)
+		// 日志格式
+		gsys.Logger.Infof("| %3d | %13v | %15s | %s | %s |",
+			statusCode,
+			latencyTime,
+			clientIP,
+			reqMethod,
+			reqUri,
+		)
 	}
 }
 

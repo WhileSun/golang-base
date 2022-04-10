@@ -30,7 +30,7 @@ func Run() {
 		Prefix:    "r",
 		TableName: "role_policy",
 		AdminRole: "super_admin",
-		ConfPath:  "config/rbac_model.conf",
+		ConfPath:  "rbac_model.conf",
 	}
 	gconf.Config.UnmarshalKey("casbin", casbinConfig)
 	genforcer = initCasbin()
@@ -47,7 +47,7 @@ func initCasbin() *casbin.Enforcer {
 		log.Fatalf("casbin gormadapter error: %s", err.Error())
 	}
 	_, file, _, _ := runtime.Caller(1)
-	enforcer, err := casbin.NewEnforcer(filepath.Dir(file)+"/../../"+casbinConfig.ConfPath, adapter)
+	enforcer, err := casbin.NewEnforcer(filepath.Dir(file)+"/"+casbinConfig.ConfPath, adapter)
 	if err != nil {
 		log.Fatalf("casbin NewEnforcer error: %s", err.Error())
 	}

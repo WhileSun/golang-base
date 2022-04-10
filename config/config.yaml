@@ -1,6 +1,6 @@
 log:
   type: file
-  stdout: true
+  stdout: false
   LogLevel: 5
 redis:
   password: 666666
@@ -16,17 +16,14 @@ database:
   name: tshop_go
   maxIdleConn: 5
   maxOpenConn: 20
-  Log: true
-jwt:
-  secret: base_go_oms
-  exp: 3600
-casbin:
-  Prefix: r
+  Log: false
 loginSetting:
   tokenKey: token
   sessionKey: user_session
   sessionEx: 7200
 app:
+  # 下面参数修改要重新初始化数据库
+  saltPwd: ws_oms
   initPwd: 123456
   userSuperName: system
   roleSuperName: super_admin

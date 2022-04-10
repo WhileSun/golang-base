@@ -5,12 +5,22 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"github.com/whilesun/go-admin/pkg/gconf"
 	"io"
 )
 
+var salt string
+
+func init() {
+	salt = gconf.Config.GetString("app.saltPwd")
+	if salt == ""{
+		salt = "ws_oms"
+	}
+}
+
 //PwdEncode 密码加密
 func PwdEncode(password string) string{
-	return Md5Encode(Sha256Encode(password,"ws_oms"))
+	return Md5Encode(Sha256Encode(password,salt))
 }
 
 func Sha256Encode(value string, salt string) string{
