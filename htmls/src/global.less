@@ -1,0 +1,97 @@
+@import '~antd/es/style/themes/default.less';
+@import 'http://at.alicdn.com/t/font_2523024_4zbxp3csbm9.css'; //素材管理图标
+@import 'http://at.alicdn.com/t/font_380688_8er5q6284me.css';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 6px;
+}
+html::-webkit-scrollbar-thumb {
+  background-color: rgba(50,50,50,.3);
+  // background: #4CAF50;
+  border-radius: 4px;
+}
+
+.ant-pro-top-nav-header-main-left{
+  margin-left: -16px;
+  padding-left: 16px;
+  min-width: 163px !important;
+  background-color: #032121;
+}
+
+#logo{
+  min-width: 164px !important;
+  img{
+    height:16px;
+  }
+  h1{
+    margin: 0 0 0 5px;
+    font-size:14px;
+  }
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+
+canvas {
+  display: block;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ul,
+// ol {
+//   list-style: none;
+// }
+
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+// Compatible with IE11
+@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
+  body .ant-design-pro > .ant-layout {
+    min-height: 100vh;
+  }
+}
+
+.icon.iconfont{
+  color: #428bca;
+  margin:0px 3px;
+  cursor: pointer;
+}
+
+.ant-form-item-label > label .ant-form-item-tooltip{
+  margin-inline-start: 4px !important;
+}
