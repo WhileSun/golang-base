@@ -111,7 +111,21 @@ func initMenu(tx *gorm.DB) error {
 		return err
 	}
 
-	passwdModel := &SMenu{po.SMenu{MenuName: "修改密码", Url: "/system/passwd", Icon: "icon-xiugaimima", ParentId: systemModel.Id, Sort: 4, MenuType: 1, Status: true, Show: true, IsSys: true}}
+	permsModel := &SMenu{po.SMenu{MenuName: "节点管理", Url: "/system/perms", Icon: "icon-jiedian", ParentId: systemModel.Id, Sort: 4, MenuType: 1, Status: true, Show: true, IsSys: true}}
+	if err := tx.Create(&permsModel).Error; err != nil {
+		return err
+	}
+	permsPermsModel := []*SMenu{
+		{po.SMenu{MenuName: "列表", DataPerms: "perms/list/get", PagePerms: "LIST", ParentId: permsModel.Id, Sort: 1, MenuType: 2, Status: true, Show: true, IsSys: true}},
+		{po.SMenu{MenuName: "添加", DataPerms: "perms/add", PagePerms: "ADD", ParentId: permsModel.Id, Sort: 2, Status: true, Show: true, MenuType: 2, IsSys: true}},
+		{po.SMenu{MenuName: "修改", DataPerms: "perms/update", PagePerms: "UPDATE", ParentId: permsModel.Id, Sort: 3, MenuType: 2, Status: true, Show: true, IsSys: true}},
+		{po.SMenu{MenuName: "删除", DataPerms: "perms/delete", PagePerms: "DELETE", ParentId: permsModel.Id, Sort: 4, MenuType: 2, Status: true, Show: true, IsSys: true}},
+	}
+	if err := tx.Create(&permsPermsModel).Error; err != nil {
+		return err
+	}
+
+	passwdModel := &SMenu{po.SMenu{MenuName: "修改密码", Url: "/system/passwd", Icon: "icon-xiugaimima", ParentId: systemModel.Id, Sort: 5, MenuType: 1, Status: true, Show: true, IsSys: true}}
 	if err := tx.Create(&passwdModel).Error; err != nil {
 		return err
 	}

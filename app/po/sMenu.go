@@ -15,7 +15,7 @@ type SMenu struct {
 	Sort      int    `json:"sort"`
 	DataPerms string `json:"data_perms"`
 	PagePerms string `json:"page_perms"`
-	Status    bool   `json:"status"`
-	Show      bool   `json:"show"`
-	IsSys     bool   `json:"is_sys"`
+	Status    bool   `json:"status" gorm:"default:true;"`
+	Show      bool   `json:"show" gorm:"default:true;"`
+	IsSys     bool   `json:"is_sys" gorm:"default:false;"`
 }

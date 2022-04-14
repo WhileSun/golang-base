@@ -3,6 +3,7 @@ package gtools
 import (
 	"encoding/json"
 	"reflect"
+	"sort"
 	"unicode"
 )
 
@@ -98,4 +99,25 @@ func VerifyPasswdV4(s string) bool {
 		}
 	}
 	return hasNumber && hasUpperCase && hasLowercase && hasSpecial
+}
+
+func InStrArray(target string, strArray []string) bool{
+	sort.Strings(strArray)
+	index := sort.SearchStrings(strArray, target)
+	if index < len(strArray) && strArray[index] == target {
+		return true
+	}
+	return false
+}
+
+func InArrayNotExist(targetArr []string, compArr []string) []string{
+	notArr:= make([]string,0)
+	sort.Strings(compArr)
+	for _,tVal := range targetArr{
+		index := sort.SearchStrings(compArr, tVal)
+		if !(index < len(compArr) && compArr[index] == tVal) {
+			notArr = append(notArr, tVal)
+		}
+	}
+	return notArr
 }

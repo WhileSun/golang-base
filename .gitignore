@@ -6,3 +6,6 @@
 /dist
 /uploads
 *.exe
+
+nginx.htaccess
+.htaccess

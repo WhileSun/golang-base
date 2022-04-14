@@ -34,6 +34,7 @@ func InitRouter() *gin.Engine {
 		{
 			load.POST("/role/list/get", (&controller.LoadController{}).GetRoleList)
 			load.POST("/menu/list/get", (&controller.LoadController{}).GetMenuList)
+			load.POST("/perms/list/get", (&controller.LoadController{}).GetPermsList)
 			load.POST("/work/taskProject/list/get", (&controller.LoadController{}).GetWorkTaskProjectList)
 		}
 		//以上接口不需要接口权限配置
@@ -53,6 +54,14 @@ func InitRouter() *gin.Engine {
 			menu.POST("/update", (&controller.MenuController{}).Update)
 			menu.POST("/list/get", (&controller.MenuController{}).GetList)
 			menu.POST("/delete", (&controller.MenuController{}).Delete)
+		}
+
+		perms := api.Group("/perms")
+		{
+			perms.POST("/add", (&controller.PermsController{}).Add)
+			perms.POST("/update", (&controller.PermsController{}).Update)
+			perms.POST("/list/get", (&controller.PermsController{}).GetList)
+			perms.POST("/delete", (&controller.PermsController{}).Delete)
 		}
 
 		role := api.Group("/role")

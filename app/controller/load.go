@@ -24,6 +24,12 @@ func (c *LoadController) GetMenuList(req *gin.Context){
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
+func (c *LoadController) GetPermsList(req *gin.Context){
+	rows := models.NewPerms().GetFieldList()
+	e.New(req).Data(e.SUCCESS, rows)
+}
+
+
 func (c *LoadController) GetWorkTaskProjectList(req *gin.Context){
 	rows := models.NewWorkTaskProject().GetFieldList()
 	e.New(req).Data(e.SUCCESS, rows)

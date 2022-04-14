@@ -5,6 +5,7 @@ import (
 	"github.com/whilesun/go-admin/app/po"
 	"github.com/whilesun/go-admin/app/vo"
 	"github.com/whilesun/go-admin/pkg/utils/gconvert"
+	"gorm.io/gorm"
 )
 
 type SMenu struct {
@@ -17,17 +18,12 @@ func NewMenu() *SMenu {
 
 func (m *SMenu) GetList() ([]*SMenu, error) {
 	var menus []*SMenu
-	db.Order("sort asc").Find(&menus)
+	db.Order("sort asc,id desc").Find(&menus)
 	return menus, nil
 }
 
-func (m *SMenu) Add() error {
-	result := db.Create(m)
-	return result.Error
-}
-
-func (m *SMenu) Update() error {
-	result := db.Model(m).Select("menu_name", "menu_type", "url", "icon", "parent_id",
+func (m *SMenu) Update(tx *gorm.DB) error {
+	result := tx.Model(m).Select("menu_name", "menu_type", "url", "icon", "parent_id",
 		"sort", "data_perms", "page_perms", "status", "show").Updates(m)
 	return result.Error
 }
@@ -81,8 +77,8 @@ func (m *SMenu) GetRow(id int) *SMenu {
 	return m
 }
 
-func (m *SMenu) CheckDataPermsExist() int {
+func (m *SMenu) CheckPagePermsExist() int {
 	var id int
-	db.Model(&SMenu{}).Select("id").Where("data_perms = ?", m.DataPerms).Scan(&id)
+	db.Model(&SMenu{}).Select("id").Where("page_perms = ? and parent_id = ?", m.PagePerms,m.ParentId).Scan(&id)
 	return id
 }
