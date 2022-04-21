@@ -12,7 +12,7 @@ const Index = (props) => {
   const tableRef = WsTable.useTable();
   const [formData,setFormData] = useState({});
   const [formShow,setFormShow] = useState(false);
-  const TaskTypeName = {1:"新增功能",2:"修复BUG",3:"优化代码"};
+  const TaskTypeName = {1:"新增功能",2:"修复BUG",3:"优化代码",4:"功能微调"};
   const performStatusName = {1:"未开始",2:"已完成",3:"进行中",4:"挂起",5:"测试中"}
   const taskLevelName = workTaskRecordLevelFunc({1:"普通",2:"紧急",3:"非常紧急"})
   const [projectSerachSelect,seProjectSerachSelect] = useState([]);
@@ -48,7 +48,7 @@ const Index = (props) => {
             </Space>);
           }},
           {name:"project_name",title:'项目名称',width:120,render:v=>{return v||'-'}},
-          {name:"title",title:'任务标题',width:150,render:v=>{return v||'-'}},
+          {name:"title",title:'任务标题',width:200,render:v=>{return v||'-'}},
           {name:"launch_time",title:'发起时间',align:'center',width:120,render:v=>{return v||'-'}},
           {name:"task_level",title:'优先级',align:'center',width:80,render:v=>{return taskLevelName[v]||'-'}},
           {name:"task_type",title:'任务类型',align:'center',width:100,render:v=>{return TaskTypeName[v]||'-'}},
