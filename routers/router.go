@@ -37,6 +37,9 @@ func InitRouter() *gin.Engine {
 			load.POST("/perms/list/get", (&controller.LoadController{}).GetPermsList)
 			load.POST("/work/taskProject/list/get", (&controller.LoadController{}).GetWorkTaskProjectList)
 		}
+
+		api.POST("/work/taskRecord/uploadPics", (&controller.WorkTaskRecordController{}).UploadPics)
+
 		//以上接口不需要接口权限配置
 		api.Use(middleware.ReqAuth())
 

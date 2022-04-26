@@ -85,7 +85,7 @@ const Index = (props) => {
           {name:"task_type",col:24,label:'任务类型',compoType:'radio',defaultValue:1,listData:TaskTypeName,required:true},
           {name:"perform_status",col:24,label:'执行状态',compoType:'radio',defaultValue:1,listData:performStatusName,required:true},
           {name:"title",col:24,label:'任务标题',compoType:'textarea',required:true},
-          {name:"content",col:24,label:'任务内容',compoType:'mdEditor',api:"/task_record/pics/upload",required:true},
+          {name:"content",col:24,label:'任务内容',compoType:'mdEditor',api:"work/taskRecord/uploadPics",required:true},
           {name:"start_time",col:12,label:'开始时间',compoType:'datetime',required:false},
           {name:"end_time",col:12,label:'结束时间',compoType:'datetime',required:false},
           {name:"remark",col:24,label:'备注',compoType:'textarea',rows:4,required:false},

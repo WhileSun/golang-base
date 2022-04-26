@@ -11,6 +11,7 @@ const isEnvProduction = process.env.NODE_ENV === "production";
 export default defineConfig({
   base: '/',
   publicPath: './',
+  outputPath:"../dist",
   hash: true,
   antd: {},
   dva: {

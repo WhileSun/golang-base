@@ -67,3 +67,14 @@ func (c *WorkTaskRecordController) Delete(req *gin.Context){
 	}
 	e.New(req).Msg(e.SUCCESS)
 }
+
+func (c *WorkTaskRecordController) UploadPics(req *gin.Context){
+	common := NewCommon()
+	urls,err := common.UploadPics(req,"work_task_record","image")
+	if err !=nil{
+		gsys.Logger.Error("工作项目上传图片失败—>", err.Error())
+		e.New(req).MsgDetail(e.FAILED,"上传图片失败")
+		return
+	}
+	e.New(req).Data(e.SUCCESS,map[string]interface{}{"url":urls})
+}
