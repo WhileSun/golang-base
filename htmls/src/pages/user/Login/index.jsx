@@ -3,7 +3,7 @@ import { message, Divider } from 'antd';
 import React, { useState, useEffect, useRef } from 'react';
 import { history, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { getCaptcha, loginUser } from '@/services/user';
+import { getCaptcha, userLogin } from '@/services/api';
 import { setToken, getToken} from '@/token';
 import styles from './index.less';
 import { Form, Input, Button, Checkbox } from 'antd';
@@ -45,7 +45,7 @@ const Login = () => {
     try {
       setLoadingState(true);
       // 登录
-      const resp = await loginUser({ ...values, captcha_id: captcha.id });
+      const resp = await userLogin({ ...values, captcha_id: captcha.id });
       setLoadingState(false);
       if (resp.code === 0) {
         message.success('登录成功！');
@@ -80,6 +80,7 @@ const Login = () => {
             onFinish={handleSubmit}
             autoComplete="off"
             form={form}
+            size="large"
           >
             <Form.Item
               name="username"
@@ -102,7 +103,7 @@ const Login = () => {
             </Form.Item>
             <Form.Item style={{ marginBottom: 0 }}>
               <Form.Item
-                name="captcha"
+                name="captcha_code"
                 // noStyle
                 className={styles.captchaItemLeft}
                 rules={[

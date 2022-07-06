@@ -10,24 +10,28 @@ import (
 	"github.com/whilesun/go-admin/pkg/gvalidator"
 )
 
-type WorkTaskRecordController struct {
+type WorkTask struct {
 }
 
-func (c *WorkTaskRecordController) GetList(req *gin.Context) {
-	workTaskRecordModel := models.NewWorkTaskRecord()
-	rows := workTaskRecordModel.GetList(req)
+func  NewWorkTask() *WorkTask{
+	return &WorkTask{}
+}
+
+func (c *WorkTask) GetList(req *gin.Context) {
+	workTaskModel := models.NewWorkTask()
+	rows := workTaskModel.GetList(req)
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *WorkTaskRecordController) Add(req *gin.Context) {
-	var params dto.AddWorkTaskRecord
+func (c *WorkTask) Add(req *gin.Context) {
+	var params dto.AddWorkTask
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("添加工作项目任务参数有误->", err.Error())
 		e.New(req).Msg(e.ERROR_API_PARAMS)
 		return
 	}
-	workTaskRecordService := service.NewWorkTaskRecord()
-	err := workTaskRecordService.Add(params)
+	workTaskService := service.NewWorkTask()
+	err := workTaskService.Add(params)
 	if err != nil {
 		e.New(req).MsgDetail(e.FAILED, err.Error())
 		return
@@ -35,15 +39,15 @@ func (c *WorkTaskRecordController) Add(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *WorkTaskRecordController) Update(req *gin.Context) {
-	var params dto.UpdateWorkTaskRecord
+func (c *WorkTask) Update(req *gin.Context) {
+	var params dto.UpdateWorkTask
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("修改工作项目任务参数有误->", err.Error())
 		e.New(req).Msg(e.ERROR_API_PARAMS)
 		return
 	}
-	workTaskRecordService := service.NewWorkTaskRecord()
-	err := workTaskRecordService.Update(params)
+	workTaskService := service.NewWorkTask()
+	err := workTaskService.Update(params)
 	if err != nil {
 		e.New(req).MsgDetail(e.FAILED, err.Error())
 		return
@@ -51,16 +55,16 @@ func (c *WorkTaskRecordController) Update(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *WorkTaskRecordController) Delete(req *gin.Context){
-	var params dto.DeleteWorkTaskRecord
+func (c *WorkTask) Delete(req *gin.Context){
+	var params dto.DeleteWorkTask
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("删除工作项目任务参数有误->",err.Error())
 		e.New(req).MsgDetail(e.ERROR_API_PARAMS,err.Error())
 		return
 	}
-	workTaskRecordModel := models.NewWorkTaskRecord()
-	workTaskRecordModel.Id = params.Id
-	if err :=workTaskRecordModel.Delete();err !=nil{
+	workTaskModel := models.NewWorkTask()
+	workTaskModel.Id = params.Id
+	if err :=workTaskModel.Delete();err !=nil{
 		gsys.Logger.Error("删除工作项目任务失败—>", err.Error())
 		e.New(req).MsgDetail(e.FAILED,"删除工作项目任务失败")
 		return
@@ -68,9 +72,9 @@ func (c *WorkTaskRecordController) Delete(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *WorkTaskRecordController) UploadPics(req *gin.Context){
+func (c *WorkTask) UploadPics(req *gin.Context){
 	common := NewCommon()
-	urls,err := common.UploadPics(req,"work_task_record","image")
+	urls,err := common.UploadPics(req,"work_task","image")
 	if err !=nil{
 		gsys.Logger.Error("工作项目上传图片失败—>", err.Error())
 		e.New(req).MsgDetail(e.FAILED,"上传图片失败")

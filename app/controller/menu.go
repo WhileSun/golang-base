@@ -10,17 +10,21 @@ import (
 	"github.com/whilesun/go-admin/pkg/gvalidator"
 )
 
-type MenuController struct {
-	BaseController
+type Menu struct {
+	Base
 }
 
-func (c *MenuController) GetList(req *gin.Context){
+func NewMenu() *Menu{
+	return &Menu{}
+}
+
+func (c *Menu) GetList(req *gin.Context){
 	menuModel := models.NewMenu()
 	rows, _ := menuModel.GetList()
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *MenuController) Add(req *gin.Context) {
+func (c *Menu) Add(req *gin.Context) {
 	var params dto.AddMenu
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("添加菜单参数有误->",err.Error())
@@ -36,7 +40,7 @@ func (c *MenuController) Add(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *MenuController) Update(req *gin.Context){
+func (c *Menu) Update(req *gin.Context){
 	var params dto.UpdateMenu
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("编辑菜单参数有误->",err.Error())
@@ -52,7 +56,7 @@ func (c *MenuController) Update(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *MenuController) Delete(req *gin.Context){
+func (c *Menu) Delete(req *gin.Context){
 	var params dto.DeleteMenu
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("删除菜单参数有误->",err.Error())

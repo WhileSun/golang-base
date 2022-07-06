@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Dropdown, Menu, Tree, Checkbox } from 'antd';
 
-const ColumnShow = (props) => {
+const ColumnShowButton = (props) => {
   const { solt, data, showColumns, setShowColumns } = props;
   const [indeterminate, setIndeterminate] = useState(true);
   const [checkAll, setCheckAll] = useState(false);
@@ -60,4 +60,4 @@ const ColumnShow = (props) => {
   );
 };
 
-export default ColumnShow;
+export default ColumnShowButton;

@@ -19,14 +19,21 @@ func LoginAuth() gin.HandlerFunc {
 			con.Abort()
 			return
 		}
-		userInfo, ok := service.NewUserAuth().VerifyLogin(token)
+		sessionKey := service.NewUserAuth().TokenDecode(token)
+		if sessionKey == ""{
+			e.New(con).Msg(e.ERROR_LOGIN_AUTH)
+			con.Abort()
+			return
+		}
+		userInfo, ok := service.NewUserAuth().VerifyLogin(sessionKey)
 		if !ok {
 			e.New(con).Msg(e.ERROR_LOGIN_AUTH)
 			con.Abort()
 			return
 		}
+		con.Set("userSession",userInfo)
 		con.Set("userId", gconvert.StrToInt(userInfo["user_id"]))
 		con.Set("username", userInfo["username"])
-		con.Set("userToken", token)
+		con.Set("userToken", sessionKey)
 	}
 }

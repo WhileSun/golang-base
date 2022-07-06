@@ -45,15 +45,15 @@ func (m *SPerms) Delete() error{
 	return db.Delete(m).Error
 }
 
-func (m *SPerms) CheckNameExist() int {
+func (m *SPerms) CheckNameExist(name string) int {
 	var id int
-	db.Model(&SPerms{}).Select("id").Where("name = ?", m.Name).Scan(&id)
+	db.Model(&SPerms{}).Select("id").Where("name = ?", name).Scan(&id)
 	return id
 }
 
-func (m *SPerms) CheckPagePermsExist() int{
+func (m *SPerms) CheckPagePermsExist(pagePerms string) int{
 	var id int
-	db.Model(&SPerms{}).Select("id").Where("page_perms = ?", m.PagePerms).Scan(&id)
+	db.Model(&SPerms{}).Select("id").Where("page_perms = ?", pagePerms).Scan(&id)
 	return id
 }
 

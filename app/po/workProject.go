@@ -1,7 +1,7 @@
 package po
 
-// WorkTaskProject 工作任务项目
-type WorkTaskProject struct {
+// WorkProject 工作任务项目
+type WorkProject struct {
 	BaseField
 	ProjectName string `json:"project_name"`
 	CreaterId   int    `json:"creater_id"`

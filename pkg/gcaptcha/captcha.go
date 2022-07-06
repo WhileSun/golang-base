@@ -24,14 +24,14 @@ func Generate() (id string, b64s string, err error) {
 		CaptchaType: "string",
 		VerifyValue: "",
 		DriverString: &base64Captcha.DriverString{
-			Height:84,
-			Width:300,
+			Height:64,
+			Width:200,
 			Length:4,
 			NoiseCount:0,
 			Source:"123456789qwertyuipkjhgfdsazxcvbnm",
 			ShowLineOptions:base64Captcha.OptionShowHollowLine|base64Captcha.OptionShowSlimeLine,
 			Fonts: []string{"wqy-microhei.ttc"},
-			BgColor:&color.RGBA{128, 98, 112,0},
+			BgColor:&color.RGBA{254, 254, 254,254},
 		},
 	}
 	var driver base64Captcha.Driver

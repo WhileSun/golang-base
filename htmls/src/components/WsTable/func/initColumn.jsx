@@ -127,7 +127,7 @@ const initColumnFunc = (fields, display, showColumns) => {
     }
   }
   //防止撑大
-  columns.push({ 'name': '' });
+  columns.push({});
   sumWidth += 0;
   //设置table宽高
   if (display == 'fixed') {

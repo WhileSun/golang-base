@@ -58,7 +58,7 @@ func (m *SMenu) GetUserRoutesList(super bool, roles []string) []*SMenu {
 		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? order by sort asc", true).Scan(&menus)
 	} else {
 		menuIds := make([]string, 0)
-		db.Model(&SRole{}).Raw("select distinct regexp_split_to_table(perms_ids,',') as menu_ids from s_role where role_identity in ? and status=?", roles, true).Scan(&menuIds)
+		db.Model(&SRole{}).Raw("select distinct regexp_split_to_table(perms_ids,',') as menu_ids from s_role where role_ident in ? and status=?", roles, true).Scan(&menuIds)
 		db.Model(&SMenu{}).Raw("SELECT * FROM s_menu where status=? and id in ? order by sort asc", true, menuIds).Scan(&menus)
 	}
 	return menus

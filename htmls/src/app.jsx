@@ -4,13 +4,15 @@ import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { getUserInfo } from '@/services/user';
 import { loginPath,isDev,iconfontUrl} from '@/config';
-import { getData } from '@/utils/tools';
+import { loadApi} from '@/utils/tools';
+import {getUserRouteList} from '@/services/api';
 import routes from '../config/routes';
 
 let PagePerms = {};
 let menuRedirect = {};
 let homeMenu = false;
 let authMenus = [];
+let userRoutes = {};
 //routes打入页面权限
 const putRoutePagePerms = (routes) => {
   routes.forEach((menu) => {
@@ -30,8 +32,8 @@ const getMenuRedirect = (menuData) => {
     }
     authMenus.push(menu.path);
     //页面权限集合
-    if (menu.perms !== undefined && menu.perms.length > 0) {
-      PagePerms[menu.path] = menu.perms;
+    if (menu.pagePerms !== undefined && menu.pagePerms.length > 0) {
+      PagePerms[menu.path] = menu.pagePerms;
     }
     if (menu.path != undefined && menu?.routes?.length > 0 && menu.layout !== false) 
     {
@@ -45,6 +47,16 @@ const getMenuRedirect = (menuData) => {
     }
   });
 };
+
+const getRouteList = (menuData)=>{
+  menuData.forEach((menu) => {
+    if(menu.path == undefined || menu.redirect!=undefined){
+      return;
+    }
+    userRoutes[menu.path] = menu;
+  });
+}
+
 //动态获取菜单栏
 const fetchMenuData = async (name) => {
   if (isDev) {
@@ -54,7 +66,7 @@ const fetchMenuData = async (name) => {
   if (name === undefined) {
     return [];
   }
-  const serverMenuData = await getData('user/routes/get', {}, (data) => {
+  const serverMenuData = await loadApi(getUserRouteList, {}, (data) => {
     return data;
   });
   getMenuRedirect(serverMenuData);
@@ -140,6 +152,7 @@ export const layout = ({initialState}) => {
         menuData: initialState?.menuData,
       },
       request:(params, menuData) => {
+        console.log(params);
         //打入页面权限
         putRoutePagePerms(menuData)
         return initialState?.menuData;

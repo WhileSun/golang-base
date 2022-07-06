@@ -1,6 +1,15 @@
 @import '~antd/es/style/themes/default.less';
 .ws-table-header{
-    margin-bottom: 5px;
+    padding-bottom: 8px;
+    .header-button{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        div:nth-child(2){
+            height: 28px;
+            line-height: 28px;
+        }
+    }
 }
 .ws-table-container{
     position: relative;
@@ -9,7 +18,7 @@
         border-bottom: 1px solid #ddd;
     }
     .ant-table-header>table{
-        border-top: 1px solid #ddd !important;
+        border-top: unset !important;
         border-left: 1px solid #ddd !important;
         thead>tr>th{
             background: #F0F0F0 !important;
@@ -20,9 +29,20 @@
     .ant-table-body>table{
         border-left: 1px solid #ddd !important;
     }
+    .ant-table-header>table .ant-table-cell{
+        border-top: 1px solid #ddd !important;
+    }
     .ant-table-cell {
         border-right:1px solid #ddd !important;
         border-bottom:1px solid #ddd !important;
+    }
+    .ant-table-header>table .ant-table-cell:empty{
+        border-top: 0px;
+        display: none;
+    }
+    .ant-table-cell:empty:last-child{
+        border-top: 0px;
+        display: none;
     }
     .ant-pagination{
         background: #fff;

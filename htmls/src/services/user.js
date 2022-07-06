@@ -1,18 +1,13 @@
 import requests from '@/request/index';
 
-/**获取验证码 */
-export async function getCaptcha() {
-  return requests.get('sys/loginCaptcha/get');
-}
-
 /**用户登录 */
-export async function loginUser(data) {
+export async function userLogin(data) {
   return requests.post('user/login',data);
 }
 
 /**用户退出 */
-export async function outLoginUser() {
-  await requests.post('user/outLogin');
+export async function userOutLogin() {
+  await requests.post('user/out.login');
   return requests.logout();
 }
 
@@ -21,3 +16,19 @@ export async function getUserInfo() {
   return requests.get('user/info/get');
 }
 
+/**获取用户路由列表 */
+export async function getUserRouteList(){
+  return requests.get('user/route/list/get');
+}
+
+export async function getUserList(params){
+  return requests.post('user/list/get',params);
+}
+
+export async function addUser(params){
+  return requests.post('user/add',params);
+}
+
+export async function updateUser(params){
+  return requests.post('user/update',params);
+}

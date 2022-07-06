@@ -6,39 +6,34 @@ import (
 	"github.com/whilesun/go-admin/app/dto"
 	"github.com/whilesun/go-admin/app/models"
 	"github.com/whilesun/go-admin/pkg/gconf"
+	"github.com/whilesun/go-admin/pkg/gcrypto"
 	"github.com/whilesun/go-admin/pkg/gsys"
 	"github.com/whilesun/go-admin/pkg/utils/gconvert"
 	"github.com/whilesun/go-admin/pkg/utils/gtools"
+	"math/rand"
+	"time"
 )
 
-type RoleService struct {
+type Role struct {
 }
 
-func NewRole() *RoleService {
-	return &RoleService{}
+func NewRole() *Role {
+	return &Role{}
 }
 
-func checkRoleIdentityExist(roleModel *models.SRole) error {
-	if id := roleModel.CheckRoleIdentityExist(); id > 0 {
-		return errors.New(fmt.Sprintf("角色权限标识[%s]已经存在，请更换！", roleModel.RoleIdentity))
+//checkRoleNameExist 检测角色名是否存在
+func (s *Role) checkRoleNameExist(roleName string) error {
+	if id := models.NewRole().CheckRoleNameExist(roleName); id > 0 {
+		return errors.New(fmt.Sprintf("角色名称[%s]已经存在，请更换！", roleName))
 	}
 	return nil
 }
 
-func checkRoleNameExist(roleModel *models.SRole) error {
-	if id := roleModel.CheckRoleNameExist(); id > 0 {
-		return errors.New(fmt.Sprintf("角色名称[%s]已经存在，请更换！", roleModel.RoleName))
-	}
-	return nil
-}
-
-func (s *RoleService) Add(params dto.AddRole) error {
+func (s *Role) Add(params dto.AddRole) error {
 	roleModel := models.NewRole()
 	gconvert.StructCopy(params, roleModel)
-	if err := checkRoleIdentityExist(roleModel); err != nil {
-		return err
-	}
-	if err := checkRoleNameExist(roleModel); err != nil {
+	roleModel.RoleIdent = gcrypto.Md5Encode16(fmt.Sprintf("%d-%d",time.Now().UnixNano(),rand.Intn(99999)))
+	if err := NewRole().checkRoleNameExist(roleModel.RoleName); err != nil {
 		return err
 	}
 	err := roleModel.Add()
@@ -49,26 +44,21 @@ func (s *RoleService) Add(params dto.AddRole) error {
 	return nil
 }
 
-func (s *RoleService) Update(params dto.UpdateRole) error {
-	odlRoleModel := models.NewRole()
-	odlRoleModel.GetRow(params.Id)
-	if odlRoleModel.Id == 0 {
+func (s *Role) Update(params dto.UpdateRole) error {
+	oldRoleModel := models.NewRole()
+	oldRoleModel.GetInfo(params.Id)
+	if oldRoleModel.Id == 0 {
 		return errors.New("需要更新的角色不存在，请确认！")
 	}
 	roleSuperName := gtools.StringDefault(gconf.Config.GetString("app.roleSuperName"), "super_admin")
-	if odlRoleModel.RoleIdentity == roleSuperName {
+	if oldRoleModel.RoleIdent == roleSuperName {
 		return errors.New("超级管理员角色不支持编辑！")
 	}
 	//更新角色
 	roleModel := models.NewRole()
 	gconvert.StructCopy(params, roleModel)
-	//if odlRoleModel.RoleIdentity != roleModel.RoleIdentity {
-	//	if err := checkRoleIdentityExist(roleModel); err != nil {
-	//		return err
-	//	}
-	//}
-	if roleModel.RoleName != roleModel.RoleName {
-		if err := checkRoleNameExist(roleModel); err != nil {
+	if oldRoleModel.RoleName != roleModel.RoleName {
+		if err := NewRole().checkRoleNameExist(roleModel.RoleName); err != nil {
 			return err
 		}
 	}
@@ -77,6 +67,9 @@ func (s *RoleService) Update(params dto.UpdateRole) error {
 		gsys.Logger.Error("编辑角色失败—>", err.Error())
 		return errors.New("更新角色失败！")
 	}
-	NewUserAuth().DelRolePerms(odlRoleModel.RoleIdentity)
+	//角色关闭或修改权限，清空缓存
+	if roleModel.PermsIds != oldRoleModel.PermsIds || (roleModel.Status == false && roleModel.Status != oldRoleModel.Status){
+		NewUserAuth().DelRolePerms(oldRoleModel.RoleIdent)
+	}
 	return nil
 }

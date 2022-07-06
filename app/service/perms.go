@@ -10,35 +10,35 @@ import (
 	"strings"
 )
 
-type PermsService struct {
+type Perms struct {
 }
 
-func NewPerms() *PermsService {
-	return &PermsService{}
+func NewPerms() *Perms {
+	return &Perms{}
 }
 
-func checkPagePermsExist(permsModel *models.SPerms) error {
-	if id := permsModel.CheckPagePermsExist(); id > 0 {
-		return errors.New(fmt.Sprintf("节点操作权限标识[%s]已经存在，请更换！", permsModel.PagePerms))
+func (s *Perms) checkPagePermsExist(pagePerms string) error {
+	if id := models.NewPerms().CheckPagePermsExist(pagePerms); id > 0 {
+		return errors.New(fmt.Sprintf("节点操作权限标识[%s]已经存在，请更换！", pagePerms))
 	}
 	return nil
 }
 
-func checkNameExist(permsModel *models.SPerms) error {
-	if id := permsModel.CheckNameExist(); id > 0 {
-		return errors.New(fmt.Sprintf("节点名称[%s]已经存在，请更换！", permsModel.Name))
+func (s *Perms) checkNameExist(name string) error {
+	if id := models.NewPerms().CheckNameExist(name); id > 0 {
+		return errors.New(fmt.Sprintf("节点名称[%s]已经存在，请更换！", name))
 	}
 	return nil
 }
 
-func (s *PermsService) Add(params dto.AddPerms) error {
+func (s *Perms) Add(params dto.AddPerms) error {
 	params.PagePerms = strings.ToUpper(params.PagePerms)
 	permsModel := models.NewPerms()
 	gconvert.StructCopy(params, permsModel)
-	if err := checkPagePermsExist(permsModel); err != nil {
+	if err := NewPerms().checkPagePermsExist(permsModel.PagePerms); err != nil {
 		return err
 	}
-	if err := checkNameExist(permsModel); err != nil {
+	if err := NewPerms().checkNameExist(permsModel.Name); err != nil {
 		return err
 	}
 	err := permsModel.Add()
@@ -49,7 +49,7 @@ func (s *PermsService) Add(params dto.AddPerms) error {
 	return nil
 }
 
-func (s *PermsService) Update(params dto.UpdatePerms) error {
+func (s *Perms) Update(params dto.UpdatePerms) error {
 	params.PagePerms = strings.ToUpper(params.PagePerms)
 	odlPermsModel := models.NewPerms()
 	odlPermsModel.GetRow(params.Id)
@@ -60,12 +60,12 @@ func (s *PermsService) Update(params dto.UpdatePerms) error {
 	permsModel := models.NewPerms()
 	gconvert.StructCopy(params, permsModel)
 	if odlPermsModel.Name != permsModel.Name {
-		if err := checkNameExist(permsModel); err != nil {
+		if err := NewPerms().checkNameExist(permsModel.Name); err != nil {
 			return err
 		}
 	}
 	if odlPermsModel.PagePerms != permsModel.PagePerms {
-		if err := checkPagePermsExist(permsModel); err != nil {
+		if err :=  NewPerms().checkPagePermsExist(permsModel.PagePerms); err != nil {
 			return err
 		}
 	}

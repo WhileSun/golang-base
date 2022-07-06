@@ -26,7 +26,7 @@ func (m *SysInit) Run() {
 		roleModel := NewRole()
 		roleModel.RoleName = "超级管理员"
 		superRoleIdentity := gtools.StringDefault(gconf.Config.GetString("app.roleSuperName"), "super_admin")
-		roleModel.RoleIdentity = superRoleIdentity
+		roleModel.RoleIdent = superRoleIdentity
 		roleModel.Sort = 1
 		roleModel.Status = true
 		if err := tx.Create(&roleModel).Error; err != nil {

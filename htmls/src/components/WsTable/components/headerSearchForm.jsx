@@ -4,7 +4,7 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 
-const SearchForm = (props) => {
+const HeaderSearchForm = (props) => {
   console.log("initSearchForm");
   const searchs = paramIsset(props.searchs, []);
   const formRef = props.formRef;
@@ -12,18 +12,15 @@ const SearchForm = (props) => {
 
   return (
     <>
-      <div style={{ display: props.show ? "block" : 'none' }}>
-        <Form
-          layout="inline"
-          // size="small"
-          form={formRef}
-          initialValues={{}}
-          onFinish={handleFormSubmit}
-        // onValuesChange={}
-        >
-          {searchs.map((field, index) => initFields(field, index))}
-        </Form>
-      </div>
+      <Form
+        layout="inline"
+        form={formRef}
+        initialValues={{}}
+        onFinish={handleFormSubmit}
+      // onValuesChange={}
+      >
+        {searchs.map((field, index) => initFields(field, index))}
+      </Form>
     </>
   );
 };
@@ -91,13 +88,12 @@ const initFields = (field, index) => {
     htmls = <RangePicker style={{ width: '180px' }} />;
   }
 
-  // console.log(field,index);
   return (
     <Form.Item
       label={field.label}
       name={fieldName}
       initialValue={field.defaultValue === undefined ? '' : field.defaultValue}
-      style={{ marginBottom: '5px', marginRight: '10px' }}
+      style={{ marginBottom: '8px', marginRight: '10px' }}
       key={index}
     >
       {htmls}
@@ -105,6 +101,4 @@ const initFields = (field, index) => {
   );
 };
 
-
-
-export default SearchForm;
+export default HeaderSearchForm;

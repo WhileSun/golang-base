@@ -2,9 +2,10 @@ import React, { useState} from 'react';
 import WsForm from '@/components/WsForm';
 import WsTable from '@/components/WsTable';
 import WsButton from '@/components/WsButton'
-import {getData,arrTransName,arrTransObj} from '@/utils/tools';
+import {arrTransName,arrTransObj, loadApi} from '@/utils/tools';
 import { Space} from 'antd';
-import {workTaskRecordLevelFunc,workTaskRecordStatusFunc} from "@/module/colorfunc";
+import {workTaskLevelFunc,workTaskStatusFunc} from "@/module/colorfunc";
+import {getWorkTaskList,addWorkTask,updateWorkTask,deleteWorkTask,getLoadWorkProjectList} from "@/services/api";
 
 var store = {};
 const Index = (props) => {
@@ -14,12 +15,12 @@ const Index = (props) => {
   const [formShow,setFormShow] = useState(false);
   const TaskTypeName = {1:"新增功能",2:"修复BUG",3:"优化代码",4:"功能微调"};
   const performStatusName = {1:"未开始",2:"已完成",3:"进行中",4:"挂起",5:"测试中"}
-  const taskLevelName = workTaskRecordLevelFunc({1:"普通",2:"紧急",3:"非常紧急"})
+  const taskLevelName = workTaskLevelFunc({1:"普通",2:"紧急",3:"非常紧急"})
   const [projectSerachSelect,seProjectSerachSelect] = useState([]);
 
   const formFunc = (row)=>{
     setFormData(row);
-    getData('load/work/taskProject/list/get',{},(data)=>{
+    loadApi(getLoadWorkProjectList,{},(data)=>{
       seProjectSerachSelect(arrTransName(data,{project_name:'label',id:'value'}));
       setFormShow(true);
     });
@@ -52,7 +53,7 @@ const Index = (props) => {
           {name:"launch_time",title:'发起时间',align:'center',width:120,render:v=>{return v||'-'}},
           {name:"task_level",title:'优先级',align:'center',width:80,render:v=>{return taskLevelName[v]||'-'}},
           {name:"task_type",title:'任务类型',align:'center',width:100,render:v=>{return TaskTypeName[v]||'-'}},
-          {name:"perform_status",title:'执行状态',align:'center',width:80,render:v=>{return workTaskRecordStatusFunc(v,performStatusName)||'-'}},
+          {name:"perform_status",title:'执行状态',align:'center',width:80,render:v=>{return workTaskStatusFunc(v,performStatusName)||'-'}},
           {name:"start_time",title:'开始时间',align:'center',width:120,render:v=>{return v||'-'}},
           {name:"end_time",title:'结束时间',align:'center',width:120,render:v=>{return v||'-'}},
           {name:"remark",title:'备注',width:250,render:v=>{return v||'-'}},
@@ -60,21 +61,21 @@ const Index = (props) => {
           {title:'操作',name:'id',width:60,align:'center',align:'left',render:function(v,row){
             return (<Space>
               <WsButton title="删除" pop={true} onClick={()=>{
-                getData('work/taskRecord/delete',{id:row.id},()=>{
+                loadApi(deleteWorkTask,{id:row.id},()=>{
                   tableRef.reload();
                 },true);
               }}/>
             </Space>);
           }}
         ]}
-        api="work/taskRecord/list/get"
+        api={getWorkTaskList}
       />
     {formShow&&<WsForm
         form={formRef}
         width={800}
-        modelFull = {true}
+        fullStatus = {true}
         title="项目任务"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
@@ -90,8 +91,8 @@ const Index = (props) => {
           {name:"end_time",col:12,label:'结束时间',compoType:'datetime',required:false},
           {name:"remark",col:24,label:'备注',compoType:'textarea',rows:4,required:false},
         ]} 
-        api="work/taskRecord/add"
-        updateApi = "work/taskRecord/update"
+        api={addWorkTask}
+        updateApi = {updateWorkTask}
         onBeforeSubmit={(params, cb) => {
           cb();
         }}

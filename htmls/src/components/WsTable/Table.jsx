@@ -1,86 +1,94 @@
-import requests from '@/request/index';
 import './index.less';
 import $ from 'jquery';
-import { Table, Form, message, Button, Tooltip, Divider } from 'antd';
+import { Table, Form, message, Button, Tooltip} from 'antd';
 import React, { useState, useEffect, useMemo, useRef, useImperativeHandle } from 'react';
-import { SettingOutlined, ReloadOutlined, SearchOutlined ,MinusSquareOutlined,PlusSquareOutlined } from '@ant-design/icons';
-import { paramIsset, funcIsset, getRandStr, toTree, parseSearchParams, setFormParamStore, arrayColumn,filterName} from './utils/tools';
+import { SettingOutlined, ReloadOutlined, SearchOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { paramIsset, getRandStr, toTree, parseFormParams, setFormParamStore, arrayColumn, filterName } from './utils/tools';
 import useTable from './hooks/useTable';
 import { WsModal } from '@/components/WsPopup';
-import SearchForm from './components/searchForm';
-import SearchButton from './components/searchButton';
-import ColumnShow from './components/columnShow';
+import HeaderSearchForm from './components/headerSearchForm';
+import HeaderButtonLeft from './components/headerButtonLeft';
+import ColumnShowButton from './components/columnShowButton';
 import initColumnFunc from './func/initColumn';
-import initShowTreeFunc from './func/initShowTree';
-
+import initShowColumnFunc from './func/initShowColumn';
+import {normalResize,modalResize} from './func/initTableTool';
 const WsTable = (props, ref) => {
   const [formRef] = Form.useForm();
-  const initialize = () => {
-    console.log('initialize');
-    let objs = {};
-    objs.th = paramIsset(props.th, []);
-    objs.size = paramIsset(props.size, 'small');
-    objs.data = paramIsset(props.data, []);
-    objs.rowKey = paramIsset(props.rowKey, 'id');
-    objs.display = paramIsset(props.display, 'fixed');
-    objs.api = paramIsset(props.api, '');
-    objs.type = paramIsset(props.type, 'normal');
-    objs.checkboxField = paramIsset(props.checkbox, false);
-    objs.treeTable = paramIsset(props.treeTable, false); //是不是tree table
-    objs.footHeight = 43; //底部宽度
-    objs.chooseIds = []; //check选中的数据
-    objs.divId = getRandStr('table');
-    return objs;
-  };
-  const [state, setState] = useState(initialize);
-  const [apiresp, setApiresp] = useState({});
-  const [apiData, setApiData] = useState([]);
+  
+  //父级设置配置
+  const config = useMemo(() => {
+    let param = {};
+    param.th = paramIsset(props.th); //列表展示字段
+    param.size =  paramIsset(props.size, 'small'); //尺寸
+    param.rowKey =paramIsset(props.rowKey, 'id'); //主键ID，选中返回的参数
+    param.display = paramIsset(props.display, 'fixed'); //展示方式fixed:固定高度;fluid:不固定
+    param.api = paramIsset(props.api, new Promise((vals)=>{})); //promise api
+    param.mode = paramIsset(props.mode, 'normal'); //模式: normal modal
+    param.checkboxField = paramIsset(props.checkbox, false); //是否开启选择框
+    param.treeTable = paramIsset(props.treeTable, false); //tree table开启
+    param.footHeight = paramIsset(props.footHeight, 43); //fixed展示，底部的高度
+    param.divId = paramIsset(props.divId, getRandStr('table'));  //table的ID
+    param.btns = paramIsset(props.btns, []); // 按钮
+    param.searchs = paramIsset(props.searchs, []); //搜索框
+
+    param.data = paramIsset(props.data, []); //table直接赋值
+    param.store = props.store;
+    param.otherFormParams = props.params; //额外参数
+    param.onLocalFilter = props.onLocalFilter; //对本地数据筛选
+
+    param.page =  paramIsset(props.page, 1); //第几页
+    param.pageSize =  paramIsset(props.pageSize, 50); //每页数
+    return param;
+  }, [props]);
+
+  const [apiresp, setApiresp] = useState({}); //api原生数据
+  const [apiData, setApiData] = useState([]); //api经过内部转化数据
   const [loading, setLoading] = useState(false);
+  const [checkedIds,setCheckedIds] = useState([]); //表格选中的ID
   const [modalShow, setModalShow] = useState(paramIsset(props.modalShow, true)); //弹出框是否显示
   //tree table
-  const [expandedRowKeys,setExpandedRowKeys] = useState([]);
-  const [rowKeys,setRowKeys] = useState([]);
-  const [treeTableshow, setTreeTableshow] = useState(true);
-
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]); //展开的节点ID
+  const [rowKeys, setRowKeys] = useState([]); //当前所有节点ID
+  const [treeTableshow, setTreeTableshow] = useState(true);  //是否是树形表
   //列设置
-  const initShowTree = useMemo(() => { return initShowTreeFunc(state.th) }, []);
-  const [showColumns, setShowColumns] = useState(initShowTree.allKeys);
-  const [searchFormShow, setSearchFormShow] = useState(true);
+  const initShowColumn = useMemo(() => { return initShowColumnFunc(config.th) }, []); //表格字段的字段和值
+  const [showColumns, setShowColumns] = useState(initShowColumn.allKeys); //表格展示的字段,默认全部
+  const [searchFormShow, setSearchFormShow] = useState(true); //是否显示搜索框
   //table column等配置信息
   const tableSetting = useMemo(() => {
-    return initColumnFunc(state.th, state.display, showColumns)
+    return initColumnFunc(config.th, config.display, showColumns)
   }, [showColumns]);
 
-  const defaultFormParams = { 'pageSize': 50, 'page': 1, ...props.params }; //默认参数
-  const [params, setParams] = useState(defaultFormParams);
-  //设置api接口的参数
-  const setNewFormParams = (newParam, type = "") => {
-    let objs = {};
-    if (type == 'changePage') {
-      objs = { ...params, ...newParam };
-    } else if (type == 'submitForm') {
+  /**查询参数整合 */
+  const defaultFormParams = { 'pageSize': config.pageSize, 'page': config.page, ...config.otherFormParams}; //默认参数
+  const [formParams, setFormParams] = useState(defaultFormParams);
+  const setFormParamsFunc = (newParam, mode = "") => {
+    let params = {};
+    if (mode == 'changePage') {
+      params = { ...formParams, ...newParam };
+    } else if (mode == 'submitForm') {
       //每次传入提交的参数不一样，所以在需要在基础上叠加
-      let newDefaultFormParams = { ...defaultFormParams, page: params.page };
-      objs = { ...newDefaultFormParams, ...newParam };
-    } else if (type == 'initForm') {
-      objs = { ...defaultFormParams, ...newParam };
+      let newDefaultFormParams = { ...defaultFormParams, page: formParams.page };
+      params = { ...newDefaultFormParams, ...newParam };
+    } else if (mode == 'initForm') {
+      params = { ...defaultFormParams, ...newParam };
     }
-    setParams(objs);
-    return objs;
+    setFormParams(params);
+    return params;
   }
 
   //初始化store保存的参数
   const setInitformParams = () => {
-    let params = setNewFormParams((parseSearchParams(props.store)), 'initForm');
+    let params = setFormParamsFunc((parseFormParams(config.store)), 'initForm');
     getData(params);
   }
 
   //form查询重置
   const handleFormReset = () => {
     console.log('handleFormReset');
-    setFormParamStore(props.store, {});
+    setFormParamStore(config.store, {});
     formRef.resetFields();
-    let params = setNewFormParams({}, 'initForm');
+    let params = setFormParamsFunc({}, 'initForm');
     getData(params);
   };
 
@@ -88,11 +96,11 @@ const WsTable = (props, ref) => {
   const handleFormSubmit = (values) => {
     console.log('handleFormSubmit');
     //针对本地数据筛选，一般针对tree table使用
-    if(props.onLocalFilter){
-      props.onLocalFilter(parseSearchParams(values))
-    }else{
-      setFormParamStore(props.store, values);
-      let params = setNewFormParams(parseSearchParams(values), 'submitForm');
+    if (config.onLocalFilter) {
+      config.onLocalFilter(parseFormParams(values))
+    } else {
+      setFormParamStore(config.store, values);
+      let params = setFormParamsFunc(parseFormParams(values), 'submitForm');
       getData(params);
     }
   };
@@ -100,22 +108,24 @@ const WsTable = (props, ref) => {
   useEffect(() => {
     setInitformParams();
     //初始化设置字段数据
-    formRef.setFieldsValue(props.store);
+    formRef.setFieldsValue(config.store);
   }, []);
 
   //换页
   const tableChangePage = (page) => {
-    let params = setNewFormParams({ page: page }, 'changePage');
+    let params = setFormParamsFunc({ page: page }, 'changePage');
     getData(params);
   };
 
+  //刷新
   const tableReload = () => {
-    getData(params);
+    getData(formParams);
   }
-  //获取table设置展示类型的数据
-  const getTableData = (data)=>{
-    if(state.treeTable){
-      setRowKeys(arrayColumn(data,"id"));
+
+  //转化table的数据类型
+  const transTableData = (data) => {
+    if (config.treeTable) {
+      setRowKeys(arrayColumn(data, "id"));
       return toTree(data);
     }
     return data;
@@ -123,11 +133,10 @@ const WsTable = (props, ref) => {
 
   const getData = async (apiParams = {}) => {
     setLoading(true);
-    console.log('getData', apiParams);
-    requests.post(state.api, apiParams).then(function (resp) {
+    config.api.call(this,apiParams).then(function (resp) {
       console.log('resp', resp);
       setApiresp(resp);
-      setApiData(getTableData(resp.data));
+      setApiData(transTableData(resp.data));
       setLoading(false);
       if (resp.code != 0) {
         message.error(resp.msg);
@@ -137,149 +146,161 @@ const WsTable = (props, ref) => {
       message.error("列表获取异常，请联系管理员处理！");
       console.log('error', error);
     });
-
   };
 
-
-  //初始话查询表单
-  const headerForm = useMemo(() => {
+  //初始化查询表单
+  const headerSearchForm = useMemo(() => {
     return (
       <>
-        <SearchForm
+        <HeaderSearchForm
           formRef={formRef}
-          searchs={props.searchs}
-          show={searchFormShow}
+          searchs={config.searchs}
           handleFormSubmit={handleFormSubmit}
         />
       </>
     );
-  }, [searchFormShow]);
+  }, []);
 
-  //表单按钮
-  const headerButton = useMemo(() => {
-    const icon = { fontSize: '16px', marginRight: '15px' };
-    const treeFunc = ()=>{
-      if(treeTableshow){
+  //头部左边按钮
+  const headerButtonLeft = useMemo(() => {
+    const fieldLen = Object.keys(paramIsset(config.searchs, [])).length;
+    return (
+      <>
+        <HeaderButtonLeft btns={config.btns} />
+        {fieldLen > 0 ? (
+          <>
+            <Button htmlType="button" onClick={handleFormReset} style={{ marginRight: '10px' }} loading={loading}>
+              重置
+            </Button>
+            <Button type="primary" onClick={() => { formRef.submit(); }} loading={loading}>
+              查询
+            </Button>
+          </>
+        ) : (
+          ''
+        )}
+      </>
+    );
+  }, [loading])
+
+  //头部右边按钮
+  const headerButtonRight = useMemo(() => {
+    const iconStyle = { fontSize: '16px', marginRight: '15px' };
+    const treeFunc = () => {
+      if (treeTableshow) {
         setExpandedRowKeys(rowKeys);
-      }else{
+      } else {
         setExpandedRowKeys([]);
       }
       setTreeTableshow(!treeTableshow)
     }
     return (
       <>
-        <SearchButton
-          formRef={formRef}
-          searchs={props.searchs}
-          btns={props.btns}
-          loading={loading}
-          handleFormReset={handleFormReset}
-          soltRightBtn={(
-            <>
-              {state.treeTable?
-              <Tooltip placement="top" title='Tree Table 展开/隐藏'>
-                {treeTableshow ? <PlusSquareOutlined style={icon} onClick={treeFunc} />:
-                <MinusSquareOutlined  style={icon} onClick={treeFunc} />}
-              </Tooltip>
-              :""}
-              <Tooltip placement="top" title='搜索框显示/隐藏'>
-                <SearchOutlined style={icon} onClick={() => {
-                  setSearchFormShow(!searchFormShow);
-                }} />
-              </Tooltip>
-              <Tooltip placement="top" title='刷新'>
-                <ReloadOutlined style={icon} onClick={tableReload} />
-              </Tooltip>
-              <ColumnShow
-                data={initShowTree}
-                showColumns={showColumns}
-                setShowColumns={(keys) => { setShowColumns(keys) }}
-                solt={(<Tooltip placement="top" title='列设置'><SettingOutlined style={{ fontSize: '16px' }} /></Tooltip>)}
-              />
-            </>
-          )}
+        {config.treeTable ?
+          <Tooltip placement="top" title='Tree Table 展开/隐藏'>
+            {treeTableshow ? <PlusSquareOutlined style={iconStyle} onClick={treeFunc} /> :
+              <MinusSquareOutlined style={iconStyle} onClick={treeFunc} />}
+          </Tooltip>
+          : ""}
+        <Tooltip placement="top" title='搜索框显示/隐藏'>
+          <SearchOutlined style={iconStyle} onClick={() => {
+            setSearchFormShow(!searchFormShow);
+          }} />
+        </Tooltip>
+        <Tooltip placement="top" title='刷新'>
+          <ReloadOutlined style={iconStyle} onClick={tableReload} />
+        </Tooltip>
+        <ColumnShowButton
+          data={initShowColumn}
+          showColumns={showColumns}
+          setShowColumns={(keys) => { setShowColumns(keys) }}
+          solt={(<Tooltip placement="top" title='列设置'><SettingOutlined style={{ fontSize: '16px' }} /></Tooltip>)}
         />
       </>
-    );
-  }, [loading, searchFormShow, showColumns,treeTableshow]);
+    )
+  }, [searchFormShow, showColumns, treeTableshow, rowKeys])
 
   useEffect(() => {
-    if (state.display == 'fixed') {
-      normalResize(state.divId,state.footHeight);
+    if (config.display == 'fixed') {
+      normalResize(config.divId, config.footHeight);
     }
-  },[searchFormShow]);
+  }, [searchFormShow]);
 
   //界面自适应
   useEffect(() => {
-    if (state.display == 'fixed') {
-      if (state.type == 'normal') {
+    if (config.display == 'fixed') {
+      if (config.mode == 'normal') {
         function resize() {
-          normalResize(state.divId, state.footHeight)
+          normalResize(config.divId, config.footHeight)
         }
         $(window).on('resize', resize);
-        // normalResize(state.divId, state.footHeight);
         return () => {
           console.log('clear');
           $(window).off('resize', resize);
         }
-      } else if (state.type == 'modal') {
+      } else if (config.mode == 'modal') {
         setTimeout(() => {
-          modalResize(state.divId, state.footHeight);
+          modalResize(config.divId, config.footHeight);
         }, 10);
       }
     }
   }, []);
 
+  //映射ref函数
   var tableInstance = useTable(props.table);
   tableInstance.reload = () => { tableReload(); };
-  tableInstance.getDataList = () => { return apiresp.data};
-  tableInstance.filterName = (dataIndex,val)=>{
-    if(val){
-      setApiData(filterName(getTableData(apiresp.data),dataIndex,val))
-    }else{
-      setApiData(getTableData(apiresp.data))
+  tableInstance.getDataList = () => { return apiresp.data };
+  tableInstance.filterName = (dataIndex, val) => {
+    if (val) {
+      setApiData(filterName(transTableData(apiresp.data), dataIndex, val))
+    } else {
+      setApiData(transTableData(apiresp.data))
     }
   };
-  tableInstance.getChooseIds = () => { return state.chooseIds; };
-  //支持原生ref
+  tableInstance.getCheckedIds = () => { return checkedIds; };
+  // //支持原生ref
   useImperativeHandle(ref, () => { return tableInstance });
 
-  const tableBody = (
+  const tableHtml = (
     <>
-      <div className={state.divId + " ws-table"}>
+      <div className={config.divId + " ws-table"}>
         <div className="ws-table-header">
-          {headerForm}
-          {headerButton}
+          <div className="header-search-form" style={{ display: searchFormShow ? "block" : 'none' }}>
+            {headerSearchForm}
+          </div>
+          <div className="header-button">
+            <div>{headerButtonLeft}</div>
+            <div>{headerButtonRight}</div>
+          </div>
         </div>
         <div className="ws-table-container">
           <Table
             ref={props.ref}
-            rowSelection={state.checkboxField ? {
+            rowSelection={config.checkboxField ? {
               type: 'checkbox',
               onChange: (selectedRowKeys) => {
-                setState({ ...state, 'chooseIds': selectedRowKeys });
+                setCheckedIds(selectedRowKeys);
               }
             } : ""}
             columns={tableSetting.columns}
             dataSource={apiData}
             bordered={true}
-            size={state.size}
-            rowKey={state.rowKey}
+            size={config.size}
+            rowKey={config.rowKey}
             scroll={tableSetting.tableScroll}
             loading={loading}
             showSizeChanger={false}
             // expandRowByClick={true}
-            onExpandedRowsChange={(expandedRows)=>{
+            onExpandedRowsChange={(expandedRows) => {
               setExpandedRowKeys(expandedRows);
-              console.log('onExpandedRowsChange',expandedRows);
             }}
             expandedRowKeys={expandedRowKeys}
             pagination={{
               position: ['bottomRight'],
-              pageSize: params.pageSize,
+              pageSize: formParams.pageSize,
               total: apiresp.totalSize,
               pageSizeOptions: [],
-              current: params.page,
+              current: formParams.page,
               size: 'small',
               showTotal: (total) => {
                 return `共 ${total} 条`;
@@ -290,26 +311,27 @@ const WsTable = (props, ref) => {
                 tableChangePage(paginate.current);
               }
             }}
-            // onRow={(record, index) => {
-            //   return {
-            //     onClick: event => {
-            //       // console.log(event);
-            //       if (event.target.dataset.act !== undefined && props.rowBtnsClick !== undefined) {
-            //         props.rowBtnsClick(event.target.dataset.act, record);
-            //       }
-            //     },
-            //   };
-            // }}
+          // onRow={(record, index) => {
+          //   return {
+          //     onClick: event => {
+          //       // console.log(event);
+          //       if (event.target.dataset.act !== undefined && props.rowBtnsClick !== undefined) {
+          //         props.rowBtnsClick(event.target.dataset.act, record);
+          //       }
+          //     },
+          //   };
+          // }}
           />
         </div>
       </div>
     </>
   );
 
-  if (state.type == 'modal') {
+  //输出样式
+  if (config.mode == 'modal') {
     return (
       <WsModal
-        content={tableBody}
+        content={tableHtml}
         show={modalShow}
         width={paramIsset(props.width, 800)}
         title={paramIsset(props.title, '列表')}
@@ -317,38 +339,8 @@ const WsTable = (props, ref) => {
       />
     )
   } else {
-    return tableBody;
+    return tableHtml;
   }
 };
-
-//常规fiexd
-const normalResize = (divId, footHeight) => {
-  if (checkTableShow(divId)) {
-    let elem = $('.' + divId);
-    let thtop = elem.find('.ant-table-body:first').offset().top;
-    elem.find('.ant-table-body').height($(window).height() - thtop - footHeight);
-  } else {
-    setTimeout(() => {
-      normalResize(divId, footHeight)
-    }, 100);
-  }
-}
-
-const checkTableShow = (divId) => {
-  let elem = $('.' + divId);
-  if (elem.find('.ant-table-body').offset() === undefined) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-//模态框的fiexd
-const modalResize = (divId, footHeight) => {
-  let elem = $('.' + divId);
-  let thtop = elem.find('.ws-table-header').height();
-  let thead = elem.find('.ant-table-header thead').height();
-  elem.find('.ant-table-body').height($(window).height() - 180 - thtop - thead - 20 - footHeight);
-}
 
 export default WsTable;

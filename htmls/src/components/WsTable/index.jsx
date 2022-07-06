@@ -5,5 +5,5 @@ import useTable from './hooks/useTable';
 var InternalForm = forwardRef(WsTable);
 var RefWsTable = InternalForm;
 RefWsTable.useTable = useTable;
-export { useTable };
+// export { useTable };
 export default RefWsTable;

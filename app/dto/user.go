@@ -13,10 +13,10 @@ type UpdateUser struct {
 }
 
 type LoginUser struct {
-	Username  string `form:"username" binding:"required"  label:"用户账号"`
-	Password  string `form:"password" binding:"required"  label:"用户密码"`
-	CaptchaId string `form:"captcha_id" binding:"required" label:"验证码ID"`
-	Captcha   string `form:"captcha" binding:"required" label:"验证码"`
+	Username    string `form:"username" binding:"required"  label:"用户账号"`
+	Password    string `form:"password" binding:"required"  label:"用户密码"`
+	CaptchaId   string `form:"captcha_id" binding:"required" label:"验证码ID"`
+	CaptchaCode string `form:"captcha_code" binding:"required" label:"验证码"`
 }
 
 type UpdateUserPasswd struct {

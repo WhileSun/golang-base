@@ -20,6 +20,25 @@ function getRandStr(prefix="") {
     return uuid;
 }
 
+function loadApi(api,params,callback,succTips=false){
+    return api.call(this,params).then((resp)=>{
+        if(resp.code ==0){
+            if(succTips){
+                console.log(succTips);
+                message.success(resp.msg);
+            }
+            if(callback){
+                return callback(resp.data);
+            }
+        }else{
+          message.error(resp.msg);
+        }
+    }).catch(function(error){
+        // message.error("api error");
+        console.log('error',error);
+    });
+}
+
 function getData(api,apiParams,callback,succTips=false){
     return requests.post(api, apiParams).then(function (resp) {
         // console.log('resp',resp);
@@ -94,4 +113,4 @@ function toTree(data){
     return val;
 }
 
-export {breakWords,showHtml,getRandStr,getData,inArray,arrTransName,arrTransObj,toTree}
+export {breakWords,showHtml,getRandStr,getData,inArray,arrTransName,arrTransObj,toTree,loadApi}

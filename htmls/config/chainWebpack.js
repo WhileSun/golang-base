@@ -1,6 +1,7 @@
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const isEnvProduction = process.env.NODE_ENV === "production";
 const assetDir = "static";
+
 export default {
   chainWebpack(config, {
     env,

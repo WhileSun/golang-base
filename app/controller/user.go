@@ -8,14 +8,19 @@ import (
 	"github.com/whilesun/go-admin/pkg/e"
 	"github.com/whilesun/go-admin/pkg/gsys"
 	"github.com/whilesun/go-admin/pkg/gvalidator"
+	"github.com/whilesun/go-admin/pkg/utils/gtools"
 )
 
-type UserController struct {
-	BaseController
+type User struct {
+	Base
+}
+
+func NewUser() *User{
+	return &User{}
 }
 
 //Login 用户登录接口
-func (c *UserController) Login(req *gin.Context) {
+func (c *User) Login(req *gin.Context) {
 	var params dto.LoginUser
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("用户登录参数有误->", err.Error())
@@ -23,30 +28,30 @@ func (c *UserController) Login(req *gin.Context) {
 		return
 	}
 	userService := service.NewUser()
-	token,code := userService.CheckLogin(&params)
+	token,code := userService.CheckLogin(params)
 	if code != e.SUCCESS {
 		e.New(req).Msg(code)
 		return
 	}
+	//生成cookie
+	req.SetCookie("token", token, 0, "", "", false, true)
 	e.New(req).Data(e.SUCCESS, map[string]interface{}{"token": token})
 }
 
 //OutLogin 用户退出接口
-func (c *UserController) OutLogin(req *gin.Context) {
-	userId := req.GetInt("userId")
+func (c *User) OutLogin(req *gin.Context) {
 	userToken := req.GetString("userToken")
-	userAuthService := service.NewUserAuth()
-	userAuthService.DelSession(userId,userToken)
+	service.NewUserAuth().DelSession(userToken)
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *UserController) GetList(req *gin.Context) {
+func (c *User) GetList(req *gin.Context) {
 	userModel := models.NewUser()
 	rows := userModel.GetList(req)
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *UserController) Add(req *gin.Context) {
+func (c *User) Add(req *gin.Context) {
 	var params dto.AddUser
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("添加用户参数有误->", err.Error())
@@ -62,7 +67,7 @@ func (c *UserController) Add(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *UserController) Update(req *gin.Context) {
+func (c *User) Update(req *gin.Context) {
 	var params dto.UpdateUser
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("修改用户参数有误->", err.Error())
@@ -78,7 +83,7 @@ func (c *UserController) Update(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *UserController) UpdatePasswd(req *gin.Context){
+func (c *User) UpdatePasswd(req *gin.Context){
 	var params dto.UpdateUserPasswd
 	if err := gvalidator.ReqValidate(req, &params); err != nil {
 		gsys.Logger.Info("修改用户密码参数有误->", err.Error())
@@ -94,17 +99,16 @@ func (c *UserController) UpdatePasswd(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *UserController) GetUserId(req *gin.Context) {
+func (c *User) GetInfo(req *gin.Context) {
 	userId := req.GetInt("userId")
-	userModel := models.NewUser()
-	userModel.GetInfo(userId)
+	userModel := models.NewUser().GetInfo(userId)
 	e.New(req).Data(e.SUCCESS, map[string]interface{}{"id": userModel.Id, "name": userModel.Realname, "avatar": "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"})
 }
 
-//GetUserRoutes 获取用户开放的路由权限
-func (c *UserController) GetUserRoutes(req *gin.Context) {
+//GetRouteList 获取用户开放的路由权限
+func (c *User) GetRouteList(req *gin.Context) {
 	menuService := service.NewMenu()
-	rows := menuService.GetUserRoutes(req.GetInt("userId"))
+	rows := menuService.GetUserRouteList(gtools.GetUserRoleIdents(req))
 	e.New(req).Data(e.SUCCESS, rows)
 }
 

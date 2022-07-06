@@ -10,11 +10,15 @@ import (
 	"github.com/whilesun/go-admin/pkg/gvalidator"
 )
 
-type RoleController struct {
-	BaseController
+type Role struct {
+	Base
 }
 
-func (c *RoleController) Add(req *gin.Context) {
+func NewRole() *Role{
+	return &Role{}
+}
+
+func (c *Role) Add(req *gin.Context) {
 	var params dto.AddRole
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("添加角色参数有误->",err.Error())
@@ -30,7 +34,7 @@ func (c *RoleController) Add(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *RoleController) Update(req *gin.Context){
+func (c *Role) Update(req *gin.Context){
 	var params dto.UpdateRole
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("编辑角色参数有误->",err.Error())
@@ -46,7 +50,7 @@ func (c *RoleController) Update(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *RoleController) GetList(req *gin.Context){
+func (c *Role) GetList(req *gin.Context){
 	roleModel := models.NewRole()
 	rows, _ := roleModel.GetList(req)
 	e.New(req).Data(e.SUCCESS, rows)

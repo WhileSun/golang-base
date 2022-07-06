@@ -1,5 +1,5 @@
 import {paramIsset} from '../utils/tools';
-import React, { useState} from 'react';
+import React, { useState,useMemo } from 'react';
 import Draggable from 'react-draggable';
 import {Modal,Button} from 'antd';
 import $ from 'jquery';
@@ -7,14 +7,29 @@ import {ArrowsAltOutlined,ShrinkOutlined} from '@ant-design/icons';
 import './index.less'
 
 const WsModal = (props)=>{
+
+  const config = useMemo(()=>{
+    let param = {};
+    param.content = paramIsset(props.content,"");
+    param.title = paramIsset(props.title,"提示");
+    param.width = paramIsset(props.width,600);
+    param.fullStatus = paramIsset(props.fullStatus,false);
+    param.loading = paramIsset(props.loading,false);
+    param.show = paramIsset(props.show,false);
+    param.forceRender = paramIsset(props.forceRender, false);
+
+    param.onCancel = props.onCancel;
+    param.onSubmit = props.onSubmit;
+    return param;
+  },[props]);
+
     //model参数
   const stateObj = {
     modelMoveDisabled: true,
     modelMoveBounds: { left: 0, top:0, bottom: 0, right: 0 },
   };
   const [modelState, setModelState] = useState(stateObj);
-  const [confirmLoading, setConfirmLoading] =useState(false);
-  const [fullStatus,setFullStatus] = useState(paramIsset(props.fullStatus,false));
+  const [fullStatus,setFullStatus] = useState(config.fullStatus);
 
   const updateModelState = (newState) => {
     setModelState({...modelState,...newState})
@@ -33,19 +48,20 @@ const WsModal = (props)=>{
       },
     });
   };
+  //关闭
   const handleCancel = (e) => {
-    if(props.cancel){props.cancel()}
+    if(config.onCancel){config.onCancel()}
   };
-
+  //提交
   const handleSubmit = () => {
     console.log('handleSubmit');
-    if(props.submit){props.submit()}
+    if(config.onSubmit){config.onSubmit()}
   };
   
   const footer = ()=>{
     let btns = [<Button key="back" onClick={handleCancel}>取消</Button>];
-    if(props.submit){
-      btns.push(<Button key="submit" type="primary" onClick={handleSubmit} loading={props.modelLoading}>提交</Button>);
+    if(config.onSubmit){
+      btns.push(<Button key="submit" type="primary" onClick={handleSubmit} loading={config.loading}>提交</Button>);
     }
     return btns;
   }
@@ -53,11 +69,12 @@ const WsModal = (props)=>{
   const toggleFullScreen = ()=>{
     setFullStatus(!fullStatus);
   }
+
   return (
     <>
       <Modal
         getContainer={false} 
-        forceRender={paramIsset(props.forceRender, false)}
+        forceRender={config.forceRender}
         wrapClassName = {fullStatus?"model-wrap-style modal-wrap-fullscreen":"model-wrap-style"}
         bodyStyle = {{maxHeight:($(window).height()-180)+'px',overflowY: "auto", padding:"5px 15px"}}
         style={{ top: 70 }}
@@ -76,7 +93,7 @@ const WsModal = (props)=>{
               updateModelState({ modelMoveDisabled: true });
             }}
           >
-            {paramIsset(props.title, '提示')}
+            {config.title}
             <button
               type="button"
               className="ant-modal-close"
@@ -98,8 +115,8 @@ const WsModal = (props)=>{
             <div ref={draggleRef}>{modal}</div>
           </Draggable>
         )}
-        visible={paramIsset(props.show, false)}
-        width={paramIsset(props.width, 600)}
+        visible={config.show}
+        width={config.width}
         onOk={handleSubmit}
         onCancel={handleCancel}
         keyboard={false}
@@ -108,7 +125,7 @@ const WsModal = (props)=>{
         footer={footer()}
         // centered
       >
-        {props.content}
+        {config.content}
       </Modal>
     </>)
 }

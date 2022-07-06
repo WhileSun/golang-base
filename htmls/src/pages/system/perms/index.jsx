@@ -2,10 +2,9 @@ import React, { useState, useRef,useMemo, useEffect} from 'react';
 import WsForm from '@/components/WsForm';
 import WsTable from '@/components/WsTable';
 import WsButton from '@/components/WsButton'
-import {breakWords as bw,inArray,getData,arrTransName} from '@/utils/tools';
+import {breakWords as bw,inArray,loadApi,arrTransName} from '@/utils/tools';
 import { Space} from 'antd';
-import {statusFunc} from '@/module/colorfunc';
-import {defaultPasswd,userSuperName} from '@/config';
+import {getPermsList,addPerms,updatePerms,deletePerms} from '@/services/api';
 
 var store = {};
 export default (props) => {
@@ -45,14 +44,14 @@ export default (props) => {
                 formFunc(row);
               }}/>
               <WsButton title="删除" pop={true} onClick={()=>{
-                getData('perms/delete',{id:row.id},()=>{
+                loadApi(deletePerms,{id:row.id},()=>{
                   tableRef.reload();
                 },true);
               }}/>
             </Space>);
           }},
         ]}
-        api="perms/list/get"
+        api={getPermsList}
         rowBtnsClick={
           (act,rowData)=>{
            
@@ -61,9 +60,8 @@ export default (props) => {
       />
     {formShow&&<WsForm
         form={formRef}
-        width={500}
         title="节点"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
@@ -72,8 +70,8 @@ export default (props) => {
           {name:"page_perms",col:24,label:'操作权限标识',tooltip:"用于前端按钮的权限控制，用大写英文描述 例：LIST、UPDATE等",compoType:'input',required:true},
           {name:"data_perms",col:24,label:'数据权限标识',tooltip:"用于后端接口的尾缀，区分大小写 例 /list/get、/update",compoType:'input',required:true},
         ]}    
-        api="perms/add"
-        updateApi = "perms/update"
+        api={addPerms}
+        updateApi = {updatePerms}
         onBeforeSubmit={(params, cb) => {
           cb();
         }}

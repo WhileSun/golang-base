@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type CommonController struct {
+type Common struct {
 }
 
 var letters = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -23,11 +23,11 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func NewCommon() *CommonController {
-	return &CommonController{}
+func NewCommon() *Common {
+	return &Common{}
 }
 
-func (c *CommonController) UploadPics(req *gin.Context, pathName string, filename string) ([]string, error) {
+func (c *Common) UploadPics(req *gin.Context, pathName string, filename string) ([]string, error) {
 	// 给表单限制上传大小 (默认 32 MiB)
 	// router.MaxMultipartMemory = 8 << 20  // 8 MiB
 	// 单文件
@@ -55,7 +55,7 @@ func (c *CommonController) UploadPics(req *gin.Context, pathName string, filenam
 			continue
 		}
 		timeStamp := time.Now().Unix()
-		fileName := fmt.Sprintf("%d.%s%s", timeStamp, randSeq(3),fileExt)
+		fileName := fmt.Sprintf("%d-%s%s", timeStamp, randSeq(5),fileExt)
 		filePathStr := filepath.Join(fileDir, fileName)
 		req.SaveUploadedFile(file, filePathStr)
 		urls = append(urls, filePathStr)

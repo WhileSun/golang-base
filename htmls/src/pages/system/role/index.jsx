@@ -7,6 +7,7 @@ import { Space,message,Tag } from 'antd';
 import {statusFunc} from '@/module/colorfunc';
 import { FileOutlined,FolderOutlined} from '@ant-design/icons';
 import {roleSuperName} from "@/config"
+import {getRoleList,addRole,updateRole} from "@/services/api";
 
 var store = {};
 export default (props) => {
@@ -47,7 +48,7 @@ export default (props) => {
         table = {tableRef}
         searchs={
           [
-            {type:'selectInput',listData:{'role_name':'角色名称','role_identity':'权限标识'}},
+            {type:'selectInput',listData:{'role_name':'角色名称'}},
             {label:'状态',type:'select',name:'status',listData:StatusList},
           ]
         }
@@ -58,7 +59,6 @@ export default (props) => {
         }
         th={[
           {name:"role_name",title:'角色名称',width:120,align:'center',render:v=>{return v||'-'}},
-          {name:"role_identity",title:'角色权限标识',width:100,align:'center',render:v=>{return v||'-'}},
           {name:"sort",title:'排序',width:100,align:'center',render:v=>{return v}},
           {name:"status",title:'状态',width:100,align:'center',render:v=>{return statusFunc(v,StatusList)||'-'}},
           {title:'操作',name:'id',width:200,align:'center',align:'left',render:function(v,row){
@@ -73,7 +73,7 @@ export default (props) => {
             </Space>);
           }},
         ]}
-        api="role/list/get"
+        api={getRoleList}
         rowBtnsClick={
           (act,rowData)=>{
            
@@ -82,21 +82,19 @@ export default (props) => {
       />
     {formShow&&<WsForm
         form={formRef}
-        width={500}
         title="角色"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
         fields={[
           {name:"role_name",col:24,label:'角色名称',compoType:'input',required:true},
-          {name:"role_identity",col:24,label:'角色权限标识',compoType:'input',disabled:!!formData.id,tooltip:"角色唯一标识，创建后不能再修改",required:true},
           {name:"sort",col:24,label:'显示排序',compoType:'inputNumber',required:true},
           {name:"status",col:24,label:'角色状态',compoType:'radio',defaultValue:'true',listData:StatusList,required:true},
           {name:"perms",col:24,label:'菜单权限',compoType:'menuTree',listData:permsTree,required:true},
         ]}    
-        api="role/add"
-        updateApi = "role/update"
+        api={addRole}
+        updateApi = {updateRole}
         onBeforeSubmit={(params, cb) => {
           params.perms_ids = params.perms.join(',');
           delete params.perms;

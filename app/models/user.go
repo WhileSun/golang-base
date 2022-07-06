@@ -8,7 +8,6 @@ import (
 	"github.com/whilesun/go-admin/pkg/utils/grequest"
 )
 
-// SUser 用户表
 type SUser struct {
 	po.SUser
 }
@@ -17,24 +16,37 @@ func NewUser() *SUser {
 	return &SUser{}
 }
 
-//CheckExist 监测用户是否存在
-func (m *SUser) CheckExist(username string, password string) *SUser {
-	db.Select("id,status,username,realname").Where("username=? and password=?", username, password).Find(m)
+//GetLoginInfo 检测账号密码是否正确
+func (m *SUser) GetLoginInfo(username string, password string) *SUser {
+	db.Select("id,status").Where("username=? and password=?", username, password).Find(m)
 	return m
 }
 
-func (m *SUser) GetPasswd(userId int) string{
+//GetSessionInfo 获取用户session存储信息
+func (m *SUser) GetSessionInfo(userId int) *vo.UserSession {
+	userSession := &vo.UserSession{}
+	db.Model(&SUser{}).Select("id,username,realname").Where("id=?",userId).Scan(userSession)
+	db.Raw(`SELECT
+			string_agg(sl.role_ident, ',') as role_idents
+		FROM 
+		r_user_role r
+		left join s_role sl on r.role_id = sl.id
+		where r.user_id = ?`, userId).Scan(&userSession.RoleIdents)
+	return userSession
+}
+
+func (m *SUser) GetPasswd(userId int) string {
 	var password string
-	db.Model(&SUser{}).Select("password").Where("id=?",userId).Scan(&password)
+	db.Model(&SUser{}).Select("password").Where("id=?", userId).Scan(&password)
 	return password
 }
 
-func (m *SUser) UpdatePasswd() error{
+func (m *SUser) UpdatePasswd() error {
 	return db.Model(m).Select("password").Updates(m).Error
 }
 
 func (m *SUser) GetInfo(id int) *SUser {
-	db.Select("id,username,realname").Where("id = ?", id).Find(m)
+	db.Select("id,username,realname,status").Where("id = ?", id).Find(m)
 	return m
 }
 
@@ -43,7 +55,7 @@ func (m *SUser) GetList(req *gin.Context) []*vo.UserList {
 	limit := grequest.PageLimit(req, bindParams)
 	searchParams := map[string]string{"u*realname": "like", "u*username": "like", "u*status": "bool"}
 	where := grequest.ParamsWhere(req, searchParams, bindParams)
-	users := make([]*vo.UserList,0)
+	users := make([]*vo.UserList, 0)
 	db.Raw(fmt.Sprintf(`SELECT
 			u.id,
 			u.username,
@@ -52,7 +64,7 @@ func (m *SUser) GetList(req *gin.Context) []*vo.UserList {
 			u.created_at,
 			u.updated_at,
 			js.role_ids_str,
-			js,role_names 
+			js,role_names
 	FROM 
 		s_user u
 		left join
@@ -69,26 +81,14 @@ func (m *SUser) GetList(req *gin.Context) []*vo.UserList {
 }
 
 //CheckUsernameExist 判断用户账号是否已经创建
-func (m *SUser) CheckUsernameExist() int {
+func (m *SUser) CheckUsernameExist(username string) int {
 	var id int
-	db.Model(&SUser{}).Select("id").Where("username = ?", m.Username).Scan(&id)
+	db.Model(&SUser{}).Select("id").Where("username = ?",username).Scan(&id)
 	return id
 }
 
-func (m *SUser) CheckRealnameExist() int {
+func (m *SUser) CheckRealnameExist(realname string) int {
 	var id int
-	db.Model(&SUser{}).Select("id").Where("realname = ?", m.Realname).Scan(&id)
+	db.Model(&SUser{}).Select("id").Where("realname = ?", realname).Scan(&id)
 	return id
-}
-
-//GetRoles 获取用户有那些管理员权限
-func (m *SUser) GetRoles(userId int) []string {
-	roles := make([]string, 0)
-	db.Raw(`SELECT role_identity FROM 
-		s_user u 
-	left join r_user_role ur on u.id = ur.user_id
-	left join s_role r on ur.role_id = r.id
-	where u.id = ?
-	`, userId).Scan(&roles)
-	return roles
 }

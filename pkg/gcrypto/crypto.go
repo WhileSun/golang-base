@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"github.com/agclqq/goencryption"
 	"github.com/whilesun/go-admin/pkg/gconf"
 	"io"
 )
@@ -33,9 +33,22 @@ func Sha256Encode(value string, salt string) string{
 }
 
 func Md5Encode(value string) string{
-	w := md5.New()
-	io.WriteString(w, value)
-	bydate := w.Sum(nil)
-	result := fmt.Sprintf("%x", bydate)
-	return result
+	h := md5.New()
+	h.Write([]byte(value))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func Md5Encode16(value string) string{
+	return Md5Encode(value)[8:24]
+}
+
+func AesEncode(value string, key string, iv string)  string{
+
+	cryptText, _ := goencryption.EasyEncrypt("aes/cbc/pkcs7/base64", value, key, iv)
+	return cryptText
+}
+
+func AesDecode(cryptText string, key string, iv string)  string{
+	value, _ := goencryption.EasyDecrypt("aes/cbc/pkcs7/base64", cryptText, key, iv)
+	return value
 }

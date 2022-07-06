@@ -16,23 +16,23 @@ const routes = [{
   },
   {
     icon: 'icon-gongzuotai',
-    path: '/work',
-    name: '工作管理',
+    path: '/plan',
+    name: '规划管理',
     routes: [{
         icon: 'icon-wodexiangmu',
-        path: '/work/task',
-        name: '任务流程',
+        path: '/plan/work',
+        name: '工作管理',
         routes: [{
             icon: 'icon-xiangmu_xiangmuguanli',
-            path: '/work/task/project',
+            path: '/plan/work/project',
             name: '项目管理',
-            component: 'work/task/project',
+            component: 'work/project',
           },
           {
             icon: 'icon-renwuguanli',
-            path: '/work/task/record',
+            path: '/plan/work/task',
             name: '任务管理',
-            component: 'work/task/record',
+            component: 'work/task',
           },
         ]
       },

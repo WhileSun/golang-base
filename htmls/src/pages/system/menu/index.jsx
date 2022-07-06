@@ -1,11 +1,12 @@
 import React, { useState, useRef,useMemo, useEffect} from 'react';
-import WsForm,{useWsForm} from '@/components/WsForm';
+import WsForm from '@/components/WsForm';
 import WsTable from '@/components/WsTable';
 import WsButton from '@/components/WsButton'
-import {breakWords as bw,inArray,getData,toTree,arrTransName} from '@/utils/tools';
+import {breakWords as bw,inArray,getData,loadApi,toTree,arrTransName} from '@/utils/tools';
 import {statusFunc,menuTypeFunc} from '@/module/colorfunc';
 import { Space} from 'antd';
 import WsIcon from '@/components/WsIcon';
+import {getMenuList,addMenu,updateMenu,deleteMenu,getLoadMenuList,getLoadPermsList} from '@/services/api';
 
 var store = {};
 
@@ -33,14 +34,14 @@ const Index = (props) => {
   const MenuShowList = {'true':'是','false':'否'};
   const MenuTypeList = {1:'菜单',2:'节点'};
   
-  const getMenuList = (cb)=>{
-    getData('load/menu/list/get',{menu_type:1},(data)=>{
+  const getInitMenuList = (cb)=>{
+    loadApi(getLoadMenuList,{menu_type:1},(data)=>{
       setMenuTreeSelect(toTree(data));
       cb;
     });
   }
-  const getPermsList = (cb)=>{
-    getData('load/perms/list/get',{},(data)=>{
+  const getInitPermsList = (cb)=>{
+    loadApi(getLoadPermsList,{},(data)=>{
       setPermsList(arrTransName(data,{name:'title',page_perms:'key'}));
       cb;
     });
@@ -53,8 +54,8 @@ const Index = (props) => {
       row.target_keys = [];
     }
     setFormData(row);
-    getMenuList(
-      getPermsList(setFormShow(true))
+    getInitMenuList(
+      getInitPermsList(setFormShow(true))
     );
   }
   return (
@@ -95,23 +96,22 @@ const Index = (props) => {
                 }}/>:""}
               <WsButton title="编辑" onClick={()=>{setMenuType(row.menu_type);formFunc(row);}}/>
               <WsButton title="删除" pop={true} onClick={()=>{
-                getData('menu/delete',{id:row.id},()=>{
+                loadApi(deleteMenu,{id:row.id},()=>{
                   tableRef.reload();
                 },true);
               }}/>
             </Space>);
           }},
         ]}
-        api="menu/list/get"
+        api={getMenuList}
         onLocalFilter={(params) => {
           tableRef.filterName("menu_name",params?.menu_name);
         }}
     />
     {formShow&&<WsForm
         form={formRef}
-        width={500}
         title="菜单栏目"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
@@ -131,9 +131,9 @@ const Index = (props) => {
           {name:"data_perms_header",col:24,label:'数组权限标识',tooltip:'节点数据权限标识前缀，例：user、menu等(只对新增的节点有效)',compoType:'input',required:false,hidden:inArray(menuType,[2],'int')},
           {name:"target_keys",col:24,label:'节点选择',compoType:'transfer',required:false,listData:permsList,topTitle:['节点列表','已赋值节点'],hidden:inArray(menuType,[2],'int')},
         ]}    
-        api="menu/add"
-        updateApi = "menu/update"
-        onBeforeSubmit={(params, cb) => {
+        api={addMenu}
+        updateApi = {updateMenu}
+        onBeforeSubmit={(params, cb) => { 
           if(params.parent_ids == "" || params.parent_ids == undefined){
             params.parent_id = 0;
           }else{

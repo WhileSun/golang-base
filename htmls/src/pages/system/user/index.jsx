@@ -2,10 +2,11 @@ import React, { useState, useRef,useMemo, useEffect} from 'react';
 import WsForm from '@/components/WsForm';
 import WsTable from '@/components/WsTable';
 import WsButton from '@/components/WsButton'
-import {breakWords as bw,inArray,getData,arrTransName} from '@/utils/tools';
+import {breakWords as bw,inArray,loadApi,arrTransName} from '@/utils/tools';
 import { Space} from 'antd';
 import {statusFunc} from '@/module/colorfunc';
 import {defaultPasswd,userSuperName} from '@/config';
+import {getUserList,getLoadRoleList,addUser,updateUser} from '@/services/api';
 
 var store = {};
 export default (props) => {
@@ -18,10 +19,10 @@ export default (props) => {
 
   const formFunc = (row)=>{
     setFormData(row)
-    getData('load/role/list/get',{},(data)=>{
+    loadApi(getLoadRoleList,{},(data)=>{
       setRoleSerachSelect(arrTransName(data,{role_name:'label',id:'value'}));
       setFormShow(true);
-    });
+    })
   }
 
   return (
@@ -58,7 +59,7 @@ export default (props) => {
             </Space>);
           }},
         ]}
-        api="user/list/get"
+        api={getUserList}
         rowBtnsClick={
           (act,rowData)=>{
            
@@ -67,9 +68,8 @@ export default (props) => {
       />
     {formShow&&<WsForm
         form={formRef}
-        width={500}
         title="用户"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
@@ -79,8 +79,8 @@ export default (props) => {
           {name:"status",col:24,label:'用户状态',compoType:'radio',defaultValue:'true',listData:StatusList,required:true},
           {name:"role_ids",mode:'multiple',col:24,label:'角色',compoType:'searchSelect',listData:roleSerachSelect,required:true},
         ]}    
-        api="user/add"
-        updateApi = "user/update"
+        api={addUser}
+        updateApi = {updateUser}
         onBeforeSubmit={(params, cb) => {
           cb();
         }}

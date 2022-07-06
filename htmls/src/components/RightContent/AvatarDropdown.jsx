@@ -5,14 +5,14 @@ import { history, useModel } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { outLoginUser } from '@/services/user';
+import { userOutLogin } from '@/services/user';
 import {loginPath} from '@/config'
 
 /**
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await outLoginUser();
+  await userOutLogin();
   const { query = {}, pathname } = history.location;
   const { redirect } = query; // Note: There may be security issues, please note
 

@@ -10,17 +10,20 @@ import (
 	"github.com/whilesun/go-admin/pkg/gvalidator"
 )
 
-type PermsController struct {
+type Perms struct {
 }
 
+func NewPerms() *Perms{
+	return &Perms{}
+}
 
-func (c *PermsController) GetList(req *gin.Context){
+func (c *Perms) GetList(req *gin.Context){
 	permsModel := models.NewPerms()
 	rows, _ := permsModel.GetList(req)
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *PermsController) Add(req *gin.Context) {
+func (c *Perms) Add(req *gin.Context) {
 	var params dto.AddPerms
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("添加节点参数有误->",err.Error())
@@ -36,7 +39,7 @@ func (c *PermsController) Add(req *gin.Context) {
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *PermsController) Update(req *gin.Context){
+func (c *Perms) Update(req *gin.Context){
 	var params dto.UpdatePerms
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("编辑节点参数有误->",err.Error())
@@ -52,7 +55,7 @@ func (c *PermsController) Update(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *PermsController) Delete(req *gin.Context){
+func (c *Perms) Delete(req *gin.Context){
 	var params dto.DeletePerms
 	if err:= gvalidator.ReqValidate(req,&params);err!=nil{
 		gsys.Logger.Info("删除节点参数有误->",err.Error())

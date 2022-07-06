@@ -16,35 +16,35 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserService struct {
+type User struct {
 }
 
-func NewUser() *UserService {
-	return &UserService{}
+func NewUser() *User {
+	return &User{}
 }
 
-func checkUsernameExist(userModel *models.SUser) error {
-	if id := userModel.CheckUsernameExist(); id > 0 {
-		return errors.New(fmt.Sprintf("用户账号[%s]已经存在，请更换！", userModel.Username))
+func (s *User) checkUsernameExist(username string) error {
+	if id := models.NewUser().CheckUsernameExist(username); id > 0 {
+		return errors.New(fmt.Sprintf("用户账号[%s]已经存在，请更换！",username))
 	}
 	return nil
 }
 
-func checkRealnameExist(userModel *models.SUser) error {
-	if id := userModel.CheckRealnameExist(); id > 0 {
-		return errors.New(fmt.Sprintf("用户名称[%s]已经存在，请更换！", userModel.Realname))
+func (s *User) checkRealnameExist(realname string) error {
+	if id :=  models.NewUser().CheckRealnameExist(realname); id > 0 {
+		return errors.New(fmt.Sprintf("用户名称[%s]已经存在，请更换！", realname))
 	}
 	return nil
 }
 
-func (s *UserService) Add(params dto.AddUser) error {
+func (s *User) Add(params dto.AddUser) error {
 	err := gsys.Db.Transaction(func(tx *gorm.DB) error {
 		userModel := models.NewUser()
 		gconvert.StructCopy(params, userModel)
-		if err := checkUsernameExist(userModel); err != nil {
+		if err := NewUser().checkUsernameExist(userModel.Username); err != nil {
 			return err
 		}
-		if err := checkRealnameExist(userModel); err != nil {
+		if err := NewUser().checkRealnameExist(userModel.Realname); err != nil {
 			return err
 		}
 		initPwd := gconf.Config.GetString("app.initPwd")
@@ -67,7 +67,7 @@ func (s *UserService) Add(params dto.AddUser) error {
 	return nil
 }
 
-func (s *UserService) Update(params dto.UpdateUser) error {
+func (s *User) Update(params dto.UpdateUser) error {
 	err := gsys.Db.Transaction(func(tx *gorm.DB) error {
 		//已入库信息
 		oldUserModel := models.NewUser()
@@ -83,12 +83,12 @@ func (s *UserService) Update(params dto.UpdateUser) error {
 		userModel := models.NewUser()
 		gconvert.StructCopy(params, userModel)
 		if oldUserModel.Username != userModel.Username {
-			if err := checkUsernameExist(userModel); err != nil {
+			if err := NewUser().checkUsernameExist(userModel.Username); err != nil {
 				return err
 			}
 		}
 		if oldUserModel.Realname != userModel.Realname {
-			if err := checkRealnameExist(userModel); err != nil {
+			if err := NewUser().checkRealnameExist(userModel.Realname); err != nil {
 				return err
 			}
 		}
@@ -97,13 +97,20 @@ func (s *UserService) Update(params dto.UpdateUser) error {
 			gsys.Logger.Error("修改用户失败—>", err.Error())
 			return errors.New("修改用户失败！")
 		}
-		//修改用户角色
-		ok := NewUserRole().Update(userModel.Id, params.RoleIds, tx)
-		if !ok {
-			return errors.New("修改用户角色失败！")
+		oldRoleIds := models.NewUserRole().GetUserRoleIds(oldUserModel.Id)
+		equalBool := gtools.StrArrayEquals(oldRoleIds,params.RoleIds,true)
+		//修改角色
+		if equalBool == false{
+			//修改用户角色
+			ok := NewUserRole().Update(userModel.Id, params.RoleIds, tx)
+			if !ok {
+				return errors.New("修改用户角色失败！")
+			}
 		}
-		//删除用户角色redis缓存
-		NewUserAuth().DelRoles(userModel.Id)
+		//修改用户状态，且关闭用户
+		if equalBool == false || (oldUserModel.Status != userModel.Status && userModel.Status == false){
+			NewUserAuth().DelAllSession(oldUserModel.Id)
+		}
 		return nil
 	})
 	if err != nil {
@@ -113,26 +120,26 @@ func (s *UserService) Update(params dto.UpdateUser) error {
 }
 
 //CheckLogin 监测用户登录
-func (s *UserService) CheckLogin(params *dto.LoginUser) (string, uint) {
-	if gcaptcha.Verify(params.CaptchaId, params.Captcha) == false {
+func (s *User) CheckLogin(params dto.LoginUser) (string, uint) {
+	if gcaptcha.Verify(params.CaptchaId, params.CaptchaCode) == false {
 		return "", e.ERROR_CAPTCHA_VERIFY
 	}
 	pwd := gcrypto.PwdEncode(params.Password)
-	user := models.NewUser().CheckExist(params.Username, pwd)
-	if user.Id == 0 {
+	userModel := models.NewUser().GetLoginInfo(params.Username, pwd)
+	if userModel.Id == 0 {
 		gsys.Logger.Error("用户登录失败 -> 账号密码错误")
 		return "", e.ERROR_ACCOUNT_LOGIN
 	}
 	//用户禁止登录
-	if user.Status == false {
+	if userModel.Status == false {
 		return "", e.ERROR_ACCOUNT_CLOSE
 	}
-	token := NewUserAuth().CreateLoginToken(user.Id)
-	NewUserAuth().SetSession(user, token)
+	sessionKey, token := NewUserAuth().TokenEncode(userModel.Id)
+	NewUserAuth().SetSession(userModel, sessionKey)
 	return token, e.SUCCESS
 }
 
-func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd, req *gin.Context) error {
+func (s *User) UpdatePasswd(params dto.UpdateUserPasswd, req *gin.Context) error {
 	ok := gtools.VerifyPasswdV4(params.NewPasswd)
 	if ok {
 		userId := req.GetInt("userId")
@@ -149,7 +156,7 @@ func (s *UserService) UpdatePasswd(params dto.UpdateUserPasswd, req *gin.Context
 			gsys.Logger.Error("更新用户新密码失败", err.Error())
 			return errors.New("更新用户新密码失败")
 		}
-		NewUserAuth().DelSession(userId, userToken)
+		NewUserAuth().DelSession(userToken)
 	} else {
 		return errors.New("密码需要符合规则[大小写字母+数字+特殊符号+6位以上]")
 	}

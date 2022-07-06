@@ -75,7 +75,7 @@ function filterName(rows,index,val,new_rows=[]){
   return new_rows;
 }
 
-const parseSearchParams=(params)=>{
+const parseFormParams=(params)=>{
   let newParams = {};
   for(let field in params){
     let val = params[field];
@@ -128,4 +128,4 @@ const arrayColumn = (arr,v,k="")=>{
   }
 }
 
-export { paramIsset, setUpdateState, momentDate, funcIsset, getRandStr,toTree,parseSearchParams,setFormParamStore,arrayColumn,filterName};
+export { paramIsset, setUpdateState, momentDate, funcIsset, getRandStr,toTree,parseFormParams,setFormParamStore,arrayColumn,filterName};

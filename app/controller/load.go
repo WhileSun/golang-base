@@ -6,31 +6,30 @@ import (
 	"github.com/whilesun/go-admin/pkg/e"
 )
 
-type LoadController struct {
+type Load struct {
 
 }
 
-func NewLoad() *LoadController{
-	return &LoadController{}
+func NewLoad() *Load{
+	return &Load{}
 }
 
-func (c *LoadController) GetRoleList(req *gin.Context){
+func (c *Load) GetRoleList(req *gin.Context){
 	rows := models.NewRole().GetFieldList()
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *LoadController) GetMenuList(req *gin.Context){
+func (c *Load) GetMenuList(req *gin.Context){
 	rows := models.NewMenu().GetFieldList(req)
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-func (c *LoadController) GetPermsList(req *gin.Context){
+func (c *Load) GetPermsList(req *gin.Context){
 	rows := models.NewPerms().GetFieldList()
 	e.New(req).Data(e.SUCCESS, rows)
 }
 
-
-func (c *LoadController) GetWorkTaskProjectList(req *gin.Context){
-	rows := models.NewWorkTaskProject().GetFieldList()
+func (c *Load) GetWorkProjectList(req *gin.Context){
+	rows := models.NewWorkProject().GetFieldList()
 	e.New(req).Data(e.SUCCESS, rows)
 }

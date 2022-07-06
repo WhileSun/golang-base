@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+type GRedis struct {
+
+}
+
 type redisConfigObj struct {
 	Server      string
 	Password    string
@@ -14,6 +18,10 @@ type redisConfigObj struct {
 	MaxIdle     int
 	IdleTimeout int
 	Select      int
+}
+
+func New() *GRedis{
+	return &GRedis{}
 }
 
 var (

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-type MenuService struct {
+type Menu struct {
 }
 
 type MenuRoutesResult struct {
@@ -26,18 +26,18 @@ type MenuRoutesResult struct {
 	Routes     []*MenuRoutesResult `json:"routes,omitempty"`
 }
 
-func NewMenu() *MenuService {
-	return &MenuService{}
+func NewMenu() *Menu {
+	return &Menu{}
 }
 
-func (s *MenuService) checkPagePermsExist(menuModel *models.SMenu) error {
+func (s *Menu) checkPagePermsExist(menuModel *models.SMenu) error {
 	if id := menuModel.CheckPagePermsExist(); id > 0 {
 		return errors.New(fmt.Sprintf("菜单操作权限标识[%s]已经存在，请更换！", menuModel.PagePerms))
 	}
 	return nil
 }
 
-func (s *MenuService) checkTypeParams(menu *models.SMenu) error {
+func (s *Menu) checkTypeParams(menu *models.SMenu) error {
 	if menu.MenuType == 1 {
 		if menu.Url == "" {
 			return errors.New("菜单链接不能为空")
@@ -50,7 +50,7 @@ func (s *MenuService) checkTypeParams(menu *models.SMenu) error {
 	return nil
 }
 
-func (s *MenuService) addPagePermsMenu(tx *gorm.DB, keys []string, parentId int, dataPermsHeader string) error {
+func (s *Menu) addPagePermsMenu(tx *gorm.DB, keys []string, parentId int, dataPermsHeader string) error {
 	var perms []*vo.PermsMenuList
 	tx.Model(models.NewPerms()).Select("name", "page_perms", "data_perms").Where("page_perms in ?", keys).Scan(&perms)
 	existPerms := make([]string, 0)
@@ -76,7 +76,7 @@ func (s *MenuService) addPagePermsMenu(tx *gorm.DB, keys []string, parentId int,
 	return nil
 }
 
-func (s *MenuService) Add(params dto.AddMenu) error {
+func (s *Menu) Add(params dto.AddMenu) error {
 	menuService := NewMenu()
 	err := gsys.Db.Transaction(func(tx *gorm.DB) error {
 		menuModel := models.NewMenu()
@@ -106,7 +106,7 @@ func (s *MenuService) Add(params dto.AddMenu) error {
 	return err
 }
 
-func (s *MenuService) Update(params dto.UpdateMenu) error {
+func (s *Menu) Update(params dto.UpdateMenu) error {
 	menuService := NewMenu()
 	err := gsys.Db.Transaction(func(tx *gorm.DB) error {
 		//操作权限标识转大写
@@ -149,7 +149,7 @@ func (s *MenuService) Update(params dto.UpdateMenu) error {
 	return err
 }
 
-func (s *MenuService) Delete(params dto.DeleteMenu) error {
+func (s *Menu) Delete(params dto.DeleteMenu) error {
 	oldMenuModel := models.NewMenu()
 	oldMenuModel.GetRow(params.Id)
 	if oldMenuModel.Id == 0 {
@@ -172,11 +172,11 @@ func (s *MenuService) Delete(params dto.DeleteMenu) error {
 	return nil
 }
 
-//GetUserRoutes 获取用户菜单栏权限
-func (s *MenuService) GetUserRoutes(userId int) []*MenuRoutesResult {
+//GetUserRouteList 获取用户菜单栏权限
+func (s *Menu) GetUserRouteList(roleIdents []string) []*MenuRoutesResult {
 	menuModel := models.NewMenu()
-	isSuper, roles := NewUserAuth().GetRoles(userId)
-	rows := menuModel.GetUserRoutesList(isSuper == 1, roles)
+	isSuper := NewUserAuth().CheckIsSuper(roleIdents)
+	rows := menuModel.GetUserRoutesList(isSuper, roleIdents)
 	menuRoutes := make([]*MenuRoutesResult, 0)
 	menuRoutes = UserRoutesTrans(rows, 0, menuRoutes)
 	return menuRoutes

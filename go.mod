@@ -3,6 +3,7 @@ module github.com/whilesun/go-admin
 go 1.16
 
 require (
+	github.com/agclqq/goencryption v0.0.0-20210816174517-562795ba8185 // indirect
 	github.com/casbin/casbin/v2 v2.42.0
 	github.com/casbin/gorm-adapter/v3 v3.5.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -11,7 +12,6 @@ require (
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.10.1
-	github.com/golang-module/carbon v1.5.5 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
-	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.10.1
 	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064 // indirect

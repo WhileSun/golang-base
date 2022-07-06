@@ -121,3 +121,19 @@ func InArrayNotExist(targetArr []string, compArr []string) []string{
 	}
 	return notArr
 }
+
+func StrArrayEquals(a []string , b []string, sortBool bool) bool{
+	if len(a) != len(b){
+		return false
+	}
+	if sortBool{
+		sort.Strings(a)
+		sort.Strings(b)
+	}
+	for i,val := range a{
+		if val != b[i]{
+			return false
+		}
+	}
+	return true
+}

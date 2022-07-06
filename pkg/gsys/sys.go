@@ -14,6 +14,7 @@ var (
 	Db       *gorm.DB
 	//Enforcer *casbin.Enforcer
 	Redis    *goredis.Pool
+	GRedis   *gredis.GRedis
 )
 
 func init(){
@@ -25,5 +26,6 @@ func init(){
 	Db = gdb.Get()
 	Logger = glog.Get()
 	Redis = gredis.GetPool()
+	GRedis = gredis.New()
 	//Enforcer = gcasbin.Get()
 }

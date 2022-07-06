@@ -1,6 +1,6 @@
 log:
   type: file
-  stdout: false
+  stdout: true
   LogLevel: 5
 redis:
   password: 666666
@@ -18,9 +18,11 @@ database:
   maxOpenConn: 20
   Log: false
 loginSetting:
-  tokenKey: token
-  sessionKey: user_session
-  sessionEx: 7200
+  # sessions设置
+  aesKey: EfoBjp9cQtjaEVGiQUu8RsXqW5dRrLGS
+  aesVi: 6bVS6Yym5lVPLmFW
+  SessionName: user_session
+  sessionEx: 604800
 app:
   # 下面参数修改要重新初始化数据库
   saltPwd: ws_oms

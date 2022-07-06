@@ -7,12 +7,16 @@ import (
 	"github.com/whilesun/go-admin/pkg/gsys"
 )
 
-type SysController struct {
-	BaseController
+type Sys struct {
+	Base
+}
+
+func NewSys() *Sys{
+	return &Sys{}
 }
 
 //GetLoginCaptcha 登录验证码
-func (c *SysController) GetLoginCaptcha(req *gin.Context){
+func (c *Sys) GetLoginCaptcha(req *gin.Context){
 	id,b64s,err := gcaptcha.Generate()
 	if err != nil{
 		gsys.Logger.Error("验证码生成失败 ->", err.Error())

@@ -3,7 +3,7 @@
  * @param {Array} fields 
  * @returns 
  */
-const initShowTreeFunc = (fields) => {
+const initShowColumnFunc = (fields) => {
   let allData = [];
   let allKeys = [];
   for (var i = 0, len = fields.length; i < len; i++) {
@@ -22,4 +22,4 @@ const initShowTreeFunc = (fields) => {
   }
   return { allData: allData, allKeys: allKeys };
 };
-export default initShowTreeFunc;
+export default initShowColumnFunc;

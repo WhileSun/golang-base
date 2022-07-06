@@ -1,101 +1,99 @@
-import React, { useState, useRef,useMemo, useImperativeHandle, useEffect} from 'react';
-import requests from '@/request/index';
 import './index.less';
+import React, { useState, useRef, useMemo, useImperativeHandle, useEffect } from 'react';
 import useForm from './hooks/useForm';
-import ItemField from './components/itemField'
-import {
-  paramIsset,
-  validateMessages,
-  formValueClean,
-  formFieldsTrans,
-  getFieldToObj,
-} from './utils/tools';
-import {
-  Form,
-  Row,
-  Col,
-  Button,
-  message,
-} from 'antd';
-import {WsModal} from '@/components/WsPopup';
+import ItemField from './components/itemField';
+import { paramIsset, validateMessages, formValueClean, formFieldsTrans, getFieldToObj } from './utils/tools';
+import { Form, Row, Col, Button, message } from 'antd';
+import { WsModal, WsDrawer } from '@/components/WsPopup';
 
 
 const WsForm = (props, ref) => {
   //使用Form ref
   const [formRef] = Form.useForm();
 
-  const initialize = () => {
-    let objs = {};
-    objs.type = paramIsset(props.type, 'Modal');
-    objs.fieldToObj = getFieldToObj(paramIsset(props.fields,{}));
-    objs.initData = paramIsset(props.data,{});
-    objs.api = paramIsset(props.api, '');
-    objs.updateApi = paramIsset(props.updateApi, objs.api);
-    objs.idKey = paramIsset(props.idKey, 'id');
-    objs.updateForm = objs.initData[objs.idKey] !== undefined;
-    return objs;
-  }
+  //基础配置
+  const config = useMemo(() => {
+    let param = {};
+    param.mode = paramIsset(props.mode, 'Modal'); //form表单的展示模式
+    param.fieldToObj = getFieldToObj(paramIsset(props.fields, {})); //name->th
+    param.initData = paramIsset(props.data, {}); //初始化值
+    param.api = paramIsset(props.api, ''); //添加api
+    param.updateApi = paramIsset(props.updateApi, param.api); //修改api
+    param.idKey = paramIsset(props.idKey, 'id'); //主键名称
+    param.updateForm = param.initData[param.idKey] != undefined; //是否是更新
+    param.fields = paramIsset(props.fields, []); // form字段
 
-  const [state, setState] = useState(initialize);
-  const [modelLoading, setModelLoading] = useState(false);
+    param.onCancel = props.onCancel; //关闭执行
+    param.onSucc = props.onSucc; //成功后回调
+    param.onBeforeSubmit = props.onBeforeSubmit; //提交前回调
+
+    param.title = paramIsset(props.title, ''); //弹出框标题
+    param.width = paramIsset(props.width, 600); //弹出框宽度
+    param.fullStatus = paramIsset(props.fullStatus, false); //弹出框是否全屏
+
+    param.widthCol = paramIsset(props.widthCol, 12); //表单宽度
+    return param;
+  }, [props])
+
+  const [loading, setLoading] = useState(false); //加载状态
   const [modelShow, setModelShow] = useState(paramIsset(props.modelShow, true));//弹出框是否显示
 
-  const closePopp = ()=> {
+  //弹出框关闭事件
+  const closePopFunc = () => {
     setModelShow(false);
-    if(props.cancel){props.cancel()};
+    if (config.onCancel) { config.onCancel() };
   }
 
-  const getData = async (apiParams={}) => {
-    setModelLoading(true);
-    let api = state.updateForm ? state.updateApi : state.api;
-    requests.post(api, apiParams).then(function (resp) {
-      console.log('resp',resp);
-      setModelLoading(false);
-      if(resp.code ==0){
-        closePopp();
-        if(props.onSucc){
-          props.onSucc()
+  const getData = async (apiParams = {}) => {
+    setLoading(true);
+    let api = config.updateForm ? config.updateApi : config.api;
+    api.call(this, apiParams).then(function (resp) {
+      console.log('resp', resp);
+      setLoading(false);
+      if (resp.code == 0) {
+        closePopFunc();
+        if (config.onSucc) {
+          config.onSucc()
         }
         message.success(resp.msg);
-      }else{
+      } else {
         message.error(resp.msg);
       }
-    }).catch(function(error){
-      setModelLoading(false);
+    }).catch(function (error) {
+      setLoading(false);
       message.error("表单提交异常，请联系管理员处理！");
-      console.log('error',error);
+      console.log('error', error);
     });
   };
 
   //提交form
   const onFormFinish = (values) => {
-    const params = formValueClean(state.fieldToObj, values);
-    if(state.updateForm){
-      params[state.idKey] = state.initData[state.idKey];
+    const params = formValueClean(config.fieldToObj, values);
+    if (config.updateForm) {
+      params[config.idKey] = config.initData[config.idKey];
     }
-    if(props.onBeforeSubmit){
-      props.onBeforeSubmit(params, () => {
+    if (config.onBeforeSubmit) {
+      config.onBeforeSubmit.call(this, params, () => {
         getData(params);
       });
-    }else{
+    } else {
       getData(params);
     }
   };
 
   //form数据打入
-  useEffect(()=>{
-    const initialValues = formFieldsTrans(state.fieldToObj, state.initData);
+  useEffect(() => {
+    const initialValues = formFieldsTrans(config.fieldToObj, config.initData);
     formRef.setFieldsValue(initialValues);
-  },[]);
+  }, []);
 
   var formInstance = useForm(props.form);
-  formInstance.setModelShow=()=>{}
+  formInstance.setModelShow = () => { }
   //支持原生ref
-  useImperativeHandle(ref,()=>{return formInstance});
+  useImperativeHandle(ref, () => { return formInstance });
 
-  const formBody = useMemo(() => {
+  const formHtml = useMemo(() => {
     console.log('initForm');
-    const fields = props.fields;
     return (
       <Form
         form={formRef}
@@ -103,48 +101,60 @@ const WsForm = (props, ref) => {
         size="default"
         validateMessages={validateMessages}
         onFinish={onFormFinish}
-        // labelCol={{ span: 6 }}
-        // wrapperCol={{ span: 18 }}
-        // onFinishFailed={onFormFinishFailed}
+      // labelCol={{ span: 6 }}
+      // wrapperCol={{ span: 18 }}
+      // onFinishFailed={onFormFinishFailed}
       >
-         <Row gutter={24}>
-           {fields.map((field, index) =>(<ItemField field={field} index={index} key={index}
-          formRef={formRef} initData={state.initData}/>))}
-          {state.type=='Form'&&
-          <Col span={24}>
-          <Form.Item style={{marginLeft:"110px"}}>
-            <Button type="primary" htmlType="submit">
-              提交
-            </Button>
-          </Form.Item>
-          </Col>}
-          </Row>
+        <Row gutter={24}>
+          {config.fields.map((field, index) => (<ItemField field={field} index={index} key={index}
+            formRef={formRef} initData={config.initData} />))}
+          {config.mode == 'Form' &&
+            <Col span={24}>
+              <Form.Item style={{ marginLeft: "110px" }}>
+                <Button type="primary" htmlType="submit">
+                  提交
+                </Button>
+              </Form.Item>
+            </Col>}
+        </Row>
       </Form>
     );
-  }, [props.fields]);
+  }, [config.fields]);
 
-  if (state.type == 'Modal') {
+  if (config.mode == 'Modal') {
     return (
       <WsModal
-      content={formBody}
-      show = {modelShow}
-      width = {props.width}
-      fullStatus = {props.modelFull}
-      title = {state.updateForm ? "编辑"+props.title:"添加"+props.title}
-      modelLoading = {modelLoading}
-      cancel = {()=>{formRef.resetFields();closePopp();}}
-      submit = {()=>{formRef.submit();}}
+        content={formHtml}
+        show={modelShow}
+        width={config.width}
+        fullStatus={config.fullStatus}
+        title={config.updateForm ? "编辑" + config.title : "添加" + config.title}
+        loading={loading}
+        onCancel={() => { formRef.resetFields(); closePopFunc(); }}
+        onSubmit={() => { formRef.submit(); }}
       />
     )
-  } else if(state.type == 'Form'){
+  } else if (config.mode == 'Form') {
     return (
       <Row>
-        <Col span={paramIsset(props.widthCol,12)}>
-          {formBody}
+        <Col span={config.widthCol}>
+          {formHtml}
         </Col>
       </Row>
     )
-  }else{
+  } else if (config.mode == 'Drawer') {
+    return (
+      <WsDrawer
+        content={formHtml}
+        show={modelShow}
+        width={config.width}
+        fullStatus={config.fullStatus}
+        title={config.updateForm ? "编辑" + config.title : "添加" + config.title}
+        loading={loading}
+        onCancel={() => { formRef.resetFields(); closePopFunc(); }}
+        onSubmit={() => { formRef.submit(); }}
+      />);
+  } else {
     return '';
   }
 };

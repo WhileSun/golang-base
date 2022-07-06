@@ -21,69 +21,70 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	api := r.Group("/api")
 	{
-		api.GET("/sys/loginCaptcha/get", (&controller.SysController{}).GetLoginCaptcha)
-		api.POST("/user/login", (&controller.UserController{}).Login)
+		api.GET("/sys/loginCaptcha/get", controller.NewSys().GetLoginCaptcha)
+		api.POST("/user/login", controller.NewUser().Login)
 		//以上接口不需要登录
 		api.Use(middleware.LoginAuth())
 
-		api.POST("/user/outLogin", (&controller.UserController{}).OutLogin)
-		api.GET("/user/info/get", (&controller.UserController{}).GetUserId)
-		api.POST("/user/routes/get", (&controller.UserController{}).GetUserRoutes)
+		api.POST("/user/out.login", controller.NewUser().OutLogin)
+		api.GET("/user/info/get", controller.NewUser().GetInfo)
+		api.GET("/user/route/list/get", controller.NewUser().GetRouteList)
 
 		load := api.Group("/load")
 		{
-			load.POST("/role/list/get", (&controller.LoadController{}).GetRoleList)
-			load.POST("/menu/list/get", (&controller.LoadController{}).GetMenuList)
-			load.POST("/perms/list/get", (&controller.LoadController{}).GetPermsList)
-			load.POST("/work/taskProject/list/get", (&controller.LoadController{}).GetWorkTaskProjectList)
+			load.POST("/role/list/get", controller.NewLoad().GetRoleList)
+			load.POST("/menu/list/get", controller.NewLoad().GetMenuList)
+			load.POST("/perms/list/get", controller.NewLoad().GetPermsList)
+			load.POST("/work_project/list/get",controller.NewLoad().GetWorkProjectList)
 		}
-
-		api.POST("/work/taskRecord/uploadPics", (&controller.WorkTaskRecordController{}).UploadPics)
 
 		//以上接口不需要接口权限配置
 		api.Use(middleware.ReqAuth())
-
 		user := api.Group("/user")
 		{
-			user.POST("/list/get", (&controller.UserController{}).GetList)
-			user.POST("/add", (&controller.UserController{}).Add)
-			user.POST("/update", (&controller.UserController{}).Update)
-			user.POST("/passwd/update", (&controller.UserController{}).UpdatePasswd)
+			user.POST("/list/get", controller.NewUser().GetList)
+			user.POST("/add", controller.NewUser().Add)
+			user.POST("/update", controller.NewUser().Update)
+			user.POST("/passwd/update", controller.NewUser().UpdatePasswd)
 		}
 
 		menu := api.Group("/menu")
 		{
-			menu.POST("/add", (&controller.MenuController{}).Add)
-			menu.POST("/update", (&controller.MenuController{}).Update)
-			menu.POST("/list/get", (&controller.MenuController{}).GetList)
-			menu.POST("/delete", (&controller.MenuController{}).Delete)
+			menu.POST("/add", controller.NewMenu().Add)
+			menu.POST("/update", controller.NewMenu().Update)
+			menu.POST("/list/get", controller.NewMenu().GetList)
+			menu.POST("/delete",controller.NewMenu().Delete)
 		}
 
 		perms := api.Group("/perms")
 		{
-			perms.POST("/add", (&controller.PermsController{}).Add)
-			perms.POST("/update", (&controller.PermsController{}).Update)
-			perms.POST("/list/get", (&controller.PermsController{}).GetList)
-			perms.POST("/delete", (&controller.PermsController{}).Delete)
+			perms.POST("/add", controller.NewPerms().Add)
+			perms.POST("/update", controller.NewPerms().Update)
+			perms.POST("/list/get", controller.NewPerms().GetList)
+			perms.POST("/delete", controller.NewPerms().Delete)
 		}
 
 		role := api.Group("/role")
 		{
-			role.POST("/add", (&controller.RoleController{}).Add)
-			role.POST("/update", (&controller.RoleController{}).Update)
-			role.POST("/list/get", (&controller.RoleController{}).GetList)
+			role.POST("/add", controller.NewRole().Add)
+			role.POST("/update", controller.NewRole().Update)
+			role.POST("/list/get", controller.NewRole().GetList)
 		}
 
-		work := api.Group("/work")
+		workProject := api.Group("/work_project")
 		{
-			work.POST("/taskProject/list/get", (&controller.WorkTaskProjectController{}).GetList)
-			work.POST("/taskProject/add", (&controller.WorkTaskProjectController{}).Add)
-			work.POST("/taskProject/update", (&controller.WorkTaskProjectController{}).Update)
+			workProject.POST("/list/get", controller.NewWorkProject().GetList)
+			workProject.POST("/add", controller.NewWorkProject().Add)
+			workProject.POST("/update", controller.NewWorkProject().Update)
+		}
 
-			work.POST("/taskRecord/list/get", (&controller.WorkTaskRecordController{}).GetList)
-			work.POST("/taskRecord/add", (&controller.WorkTaskRecordController{}).Add)
-			work.POST("/taskRecord/update", (&controller.WorkTaskRecordController{}).Update)
-			work.POST("/taskRecord/delete", (&controller.WorkTaskRecordController{}).Delete)
+		workTask := api.Group("/work_task")
+		{
+			workTask.POST("/list/get", controller.NewWorkTask().GetList)
+			workTask.POST("/add",  controller.NewWorkTask().Add)
+			workTask.POST("/update",  controller.NewWorkTask().Update)
+			workTask.POST("/delete",  controller.NewWorkTask().Delete)
+			workTask.POST("/upload_pics", controller.NewWorkTask().UploadPics)
 		}
 	}
 	return r

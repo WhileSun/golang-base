@@ -2,7 +2,7 @@ import React, { useState} from 'react';
 import {useModel} from 'umi';
 import WsForm from '@/components/WsForm';
 import { message } from 'antd';
-import {outLoginUser} from '@/services/user';
+import {userOutLogin} from '@/services/user';
 import { loginPath } from '@/config';
 
 export default (props) => {
@@ -14,7 +14,7 @@ export default (props) => {
     <WsForm
         form={formRef}
         widthCol={10}
-        type="Form"
+        mode="Form"
         title="修改密码"
         data = {{realname:currentUser?.name}}
         fields={[
@@ -38,8 +38,8 @@ export default (props) => {
           cb();
         }}
         onSucc={async ()=>{
-          await outLoginUser();
-          // history.push(loginPath);
+          await userOutLogin();
+          history.push(loginPath);
         }}
       />
     </> 

@@ -4,9 +4,9 @@ import (
 	"github.com/whilesun/go-admin/pkg/utils/gtime"
 )
 
-type WorkTaskRecord struct {
+type WorkTask struct {
 	BaseField
-	TaskProjectId int            `json:"task_project_id"`
+	ProjectId     int            `json:"project_id"`
 	LaunchTime    gtime.DateTime `json:"launch_time"`
 	StartTime     gtime.DateTime `json:"start_time"`
 	EndTime       gtime.DateTime `json:"end_time"`

@@ -3,6 +3,7 @@ import WsForm from '@/components/WsForm';
 import WsTable from '@/components/WsTable';
 import WsButton from '@/components/WsButton'
 import { Space} from 'antd';
+import {getWorkProjectList,addWorkProject,updateWorkProject} from '@/services/api';
 
 var store = {};
 const Index = (props) => {
@@ -36,13 +37,13 @@ const Index = (props) => {
             </Space>);
           }},
         ]}
-        api="work/taskProject/list/get"
+        api={getWorkProjectList}
       />
     {formShow&&<WsForm
         form={formRef}
         width={500}
         title="项目"
-        cancel = {()=>{
+        onCancel = {()=>{
           setFormShow(false);
         }}
         data = {formData}
@@ -50,8 +51,8 @@ const Index = (props) => {
           {name:"project_name",col:24,label:'项目名称',compoType:'input',required:true},
           {name:"remark",col:24,label:'备注',compoType:'textarea',required:true},
         ]}    
-        api="work/taskProject/add"
-        updateApi = "work/taskProject/update"
+        api={addWorkProject}
+        updateApi = {updateWorkProject}
         onBeforeSubmit={(params, cb) => {
           cb();
         }}

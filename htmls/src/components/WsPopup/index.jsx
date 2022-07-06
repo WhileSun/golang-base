@@ -1,3 +1,5 @@
 import WsModal from './modal';
+import WsDrawer from './drawer';
 
-export { WsModal };
+
+export { WsModal,WsDrawer};
