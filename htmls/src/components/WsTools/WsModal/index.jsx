@@ -1,38 +1,41 @@
-import {paramIsset} from '../utils/tools';
-import React, { useState,useMemo } from 'react';
+import { paramIsset } from '../utils/tools';
+import React, { useState, useMemo } from 'react';
 import Draggable from 'react-draggable';
-import {Modal,Button} from 'antd';
+import { Modal, Button } from 'antd';
 import $ from 'jquery';
-import {ArrowsAltOutlined,ShrinkOutlined} from '@ant-design/icons';
+import { ArrowsAltOutlined, ShrinkOutlined } from '@ant-design/icons';
 import './index.less'
 
-const WsModal = (props)=>{
+const WsModal = (props) => {
 
-  const config = useMemo(()=>{
+  const config = useMemo(() => {
     let param = {};
-    param.content = paramIsset(props.content,"");
-    param.title = paramIsset(props.title,"提示");
-    param.width = paramIsset(props.width,600);
-    param.fullStatus = paramIsset(props.fullStatus,false);
-    param.loading = paramIsset(props.loading,false);
-    param.show = paramIsset(props.show,false);
+    param.content = paramIsset(props.content, "");
+    param.title = paramIsset(props.title, "提示");
+    param.width = paramIsset(props.width, 600);
+    param.fullVisible = paramIsset(props.fullVisible, false);
+    param.fullStatus = paramIsset(props.fullStatus, false);
+    param.loading = paramIsset(props.loading, false);
+    param.visible = paramIsset(props.visible, false);
     param.forceRender = paramIsset(props.forceRender, false);
+    param.okText = paramIsset(props.okText, '确定');
+    param.footer = paramIsset(props.footer, []);
 
     param.onCancel = props.onCancel;
-    param.onSubmit = props.onSubmit;
+    param.onOk = props.onOk;
     return param;
-  },[props]);
+  }, [props]);
 
-    //model参数
+  //model参数
   const stateObj = {
     modelMoveDisabled: true,
-    modelMoveBounds: { left: 0, top:0, bottom: 0, right: 0 },
+    modelMoveBounds: { left: 0, top: 0, bottom: 0, right: 0 },
   };
   const [modelState, setModelState] = useState(stateObj);
-  const [fullStatus,setFullStatus] = useState(config.fullStatus);
+  const [fullStatus, setFullStatus] = useState(config.fullStatus);
 
   const updateModelState = (newState) => {
-    setModelState({...modelState,...newState})
+    setModelState({ ...modelState, ...newState })
   };
   //model拖拉
   const draggleRef = React.createRef();
@@ -50,39 +53,40 @@ const WsModal = (props)=>{
   };
   //关闭
   const handleCancel = (e) => {
-    if(config.onCancel){config.onCancel()}
+    if (config.onCancel) { config.onCancel(e) }
   };
   //提交
-  const handleSubmit = () => {
-    console.log('handleSubmit');
-    if(config.onSubmit){config.onSubmit()}
+  const handleSubmit = (e) => {
+    if (config.onOk) { config.onOk(e) }
   };
-  
-  const footer = ()=>{
-    let btns = [<Button key="back" onClick={handleCancel}>取消</Button>];
-    if(config.onSubmit){
-      btns.push(<Button key="submit" type="primary" onClick={handleSubmit} loading={config.loading}>提交</Button>);
+
+  const footer = () => {
+    if (config.footer.length > 0) {
+      return config.footer;
+    } else {
+      let btns = [<Button key="back" onClick={handleCancel}>取消</Button>,
+      <Button key="submit" type="primary" onClick={handleSubmit} loading={config.loading}>{config.okText}</Button>]; 
+      return btns;
     }
-    return btns;
   }
 
-  const toggleFullScreen = ()=>{
+  const toggleFullScreen = () => {
     setFullStatus(!fullStatus);
   }
 
   return (
     <>
       <Modal
-        getContainer={false} 
+        getContainer={false}
         forceRender={config.forceRender}
-        wrapClassName = {fullStatus?"model-wrap-style modal-wrap-fullscreen":"model-wrap-style"}
-        bodyStyle = {{maxHeight:($(window).height()-180)+'px',overflowY: "auto", padding:"5px 15px"}}
-        style={{ top: 70 }}
+        wrapClassName={config.fullVisible && fullStatus ? "wsmodel-wrap-style wsmodal-wrap-fullscreen" : "wsmodel-wrap-style"}
+        bodyStyle={{ maxHeight: ($(window).height() - 180) + 'px', overflowY: "auto", padding: "5px 15px" }}
+        // style={{ top: 70 }}
         title={
           <div
             style={{
               width: '100%',
-              cursor: 'move', 
+              cursor: 'move',
             }}
             onMouseOver={() => {
               if (modelState.modelMoveDisabled) {
@@ -101,7 +105,7 @@ const WsModal = (props)=>{
               onClick={toggleFullScreen}
             >
               <span className="ant-modal-close-x">
-                {!fullStatus?<ArrowsAltOutlined />:<ShrinkOutlined/>}
+                {config.fullVisible ? (!fullStatus ? <ArrowsAltOutlined /> : <ShrinkOutlined />) : ''}
               </span>
             </button>
           </div>
@@ -115,7 +119,7 @@ const WsModal = (props)=>{
             <div ref={draggleRef}>{modal}</div>
           </Draggable>
         )}
-        visible={config.show}
+        visible={config.visible}
         width={config.width}
         onOk={handleSubmit}
         onCancel={handleCancel}
@@ -123,7 +127,7 @@ const WsModal = (props)=>{
         maskClosable={false}
         destroyOnClose={true}
         footer={footer()}
-        // centered
+      // centered
       >
         {config.content}
       </Modal>

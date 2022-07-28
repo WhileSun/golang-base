@@ -135,7 +135,7 @@ export const layout = ({initialState}) => {
           history.push(menuRedirect[pathname]);
           return;
         }
-        // //无权限页面404展示
+        //无权限页面404展示
         if (!authMenus.includes(pathname)) {
           history.push('/404');
           return;

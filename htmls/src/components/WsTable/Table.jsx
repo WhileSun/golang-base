@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo, useRef, useImperativeHandle } from
 import { SettingOutlined, ReloadOutlined, SearchOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { paramIsset, getRandStr, toTree, parseFormParams, setFormParamStore, arrayColumn, filterName } from './utils/tools';
 import useTable from './hooks/useTable';
-import { WsModal } from '@/components/WsPopup';
+import { WsModal } from '@/components/WsTools';
 import HeaderSearchForm from './components/headerSearchForm';
 import HeaderButtonLeft from './components/headerButtonLeft';
 import ColumnShowButton from './components/columnShowButton';

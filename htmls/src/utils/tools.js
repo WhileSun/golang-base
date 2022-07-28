@@ -24,8 +24,11 @@ function loadApi(api,params,callback,succTips=false){
     return api.call(this,params).then((resp)=>{
         if(resp.code ==0){
             if(succTips){
-                console.log(succTips);
-                message.success(resp.msg);
+                let msg = resp.msg;
+                if(succTips !== true){
+                    msg = succTips;
+                }
+                message.success({content:msg});
             }
             if(callback){
                 return callback(resp.data);
@@ -113,4 +116,36 @@ function toTree(data){
     return val;
 }
 
-export {breakWords,showHtml,getRandStr,getData,inArray,arrTransName,arrTransObj,toTree,loadApi}
+const transTree = (rows,title="",key="")=>{
+    return rows.map((row)=>{
+        let treeRow  ={};
+        treeRow.title = row[title];
+        treeRow.key = String(row[key]);
+        if(row['children'] !==undefined){
+            treeRow.children =  transTree(row['children'],title,key);
+        }
+        return treeRow;
+    }).filter(result => result!==undefined)
+}
+
+const getTreeKeys = (rows,keys=[])=>{
+    rows.map((row)=>{
+        if(row.key !== undefined){
+            keys.push(row.key);
+        }
+        if(row.children !==undefined){
+            getTreeKeys(row.children,keys);
+        }
+    })
+    return keys;
+}
+
+const getDefualtValue = (value,defalutValue='')=>{
+    if(value===null || value==''){
+        return defalutValue;
+    }else{
+        return value;
+    }
+}
+
+export {breakWords,showHtml,getRandStr,getData,inArray,arrTransName,arrTransObj,toTree,loadApi,transTree,getTreeKeys,getDefualtValue}

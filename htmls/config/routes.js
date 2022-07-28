@@ -16,23 +16,48 @@ const routes = [{
   },
   {
     icon: 'icon-gongzuotai',
-    path: '/plan',
-    name: '规划管理',
+    path: '/daily',
+    name: '日常笔记',
     routes: [{
         icon: 'icon-wodexiangmu',
-        path: '/plan/work',
+        path: '/daily/work',
         name: '工作管理',
         routes: [{
             icon: 'icon-xiangmu_xiangmuguanli',
-            path: '/plan/work/project',
+            path: '/daily/work/project',
             name: '项目管理',
             component: 'work/project',
           },
           {
             icon: 'icon-renwuguanli',
-            path: '/plan/work/task',
+            path: '/daily/work/task',
             name: '任务管理',
             component: 'work/task',
+          },
+        ]
+      },
+      {
+        icon: 'icon-wodexiangmu',
+        path: '/daily/md',
+        name: '文档管理',
+        routes: [
+          {
+            path: '/daily/md/book',
+            name: '文档书籍',
+            component: 'md/book',
+          },{
+            path: '/daily/md/document/edit',
+            name: '文档内容编辑',
+            component: 'md/document/edit',
+            layout:false,
+            hideInMenu:true,
+          },
+          {
+            path: '/daily/md/document',
+            name: '文档内容',
+            component: 'md/document',
+            layout:false,
+            hideInMenu:true,
           },
         ]
       },

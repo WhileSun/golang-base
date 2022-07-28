@@ -4,7 +4,7 @@ import useForm from './hooks/useForm';
 import ItemField from './components/itemField';
 import { paramIsset, validateMessages, formValueClean, formFieldsTrans, getFieldToObj } from './utils/tools';
 import { Form, Row, Col, Button, message } from 'antd';
-import { WsModal, WsDrawer } from '@/components/WsPopup';
+import { WsModal, WsDrawer } from '@/components/WsTools';
 
 
 const WsForm = (props, ref) => {
@@ -36,11 +36,11 @@ const WsForm = (props, ref) => {
   }, [props])
 
   const [loading, setLoading] = useState(false); //加载状态
-  const [modelShow, setModelShow] = useState(paramIsset(props.modelShow, true));//弹出框是否显示
+  const [modelVisible, setModelVisible] = useState(paramIsset(props.modelVisible, true));//弹出框是否显示
 
   //弹出框关闭事件
   const closePopFunc = () => {
-    setModelShow(false);
+    setModelVisible(false);
     if (config.onCancel) { config.onCancel() };
   }
 
@@ -88,7 +88,7 @@ const WsForm = (props, ref) => {
   }, []);
 
   var formInstance = useForm(props.form);
-  formInstance.setModelShow = () => { }
+  formInstance.setModelVisible = () => { }
   //支持原生ref
   useImperativeHandle(ref, () => { return formInstance });
 
@@ -125,13 +125,14 @@ const WsForm = (props, ref) => {
     return (
       <WsModal
         content={formHtml}
-        show={modelShow}
+        visible={modelVisible}
         width={config.width}
+        fullVisible={true}
         fullStatus={config.fullStatus}
         title={config.updateForm ? "编辑" + config.title : "添加" + config.title}
         loading={loading}
         onCancel={() => { formRef.resetFields(); closePopFunc(); }}
-        onSubmit={() => { formRef.submit(); }}
+        onOk={() => { formRef.submit(); }}
       />
     )
   } else if (config.mode == 'Form') {
@@ -146,7 +147,7 @@ const WsForm = (props, ref) => {
     return (
       <WsDrawer
         content={formHtml}
-        show={modelShow}
+        show={modelVisible}
         width={config.width}
         fullStatus={config.fullStatus}
         title={config.updateForm ? "编辑" + config.title : "添加" + config.title}

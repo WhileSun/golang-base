@@ -2,8 +2,12 @@ package gtools
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/whilesun/go-admin/pkg/gcrypto"
+	"math/rand"
 	"reflect"
 	"sort"
+	"time"
 	"unicode"
 )
 
@@ -136,4 +140,8 @@ func StrArrayEquals(a []string , b []string, sortBool bool) bool{
 		}
 	}
 	return true
+}
+
+func StrRand(header string) string{
+	return header + gcrypto.Md5Encode16(fmt.Sprintf("%d-%d",time.Now().UnixNano(),rand.Intn(99999)))
 }

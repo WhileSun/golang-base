@@ -41,6 +41,9 @@ export default defineConfig({
     type: 'none',
   },
   routes: routes,
+  alias:{
+    '@static': require('path').resolve(__dirname, '../public/static'),
+  },
   theme: {
     // '@font-size-base':'12px',
   },

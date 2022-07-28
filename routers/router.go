@@ -86,6 +86,22 @@ func InitRouter() *gin.Engine {
 			workTask.POST("/delete",  controller.NewWorkTask().Delete)
 			workTask.POST("/upload_pics", controller.NewWorkTask().UploadPics)
 		}
+
+		{
+			api.POST("md_document_name/list/get",  controller.NewMdDocument().GetNameList)
+			api.POST("md_document_name/add",  controller.NewMdDocument().AddName)
+			api.POST("md_document_name/update",  controller.NewMdDocument().UpdateName)
+			api.POST("md_document_name/delete",  controller.NewMdDocument().DeleteName)
+			api.POST("md_document_name/drag",  controller.NewMdDocument().DragName)
+			api.POST("md_document_text/get",  controller.NewMdDocument().GetText)
+			api.POST("md_document_text/update",  controller.NewMdDocument().UpdateText)
+		}
+
+		{
+			api.POST("md_book/list/get",  controller.NewMdBook().GetList)
+			api.POST("md_book/add",  controller.NewMdBook().Add)
+			api.POST("md_book/update",  controller.NewMdBook().Update)
+		}
 	}
 	return r
 }
