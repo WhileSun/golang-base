@@ -1,77 +1,66 @@
-import { Button,Popconfirm } from 'antd';
-
-const titleColor = (title, buttonColor) => {
-  let newButtonColor = '';
-  switch (title) {
-    case '编辑':
-      newButtonColor = 'bule';
-      break;
-    case '删除':
-      newButtonColor = 'red';
-      break;
-    case '添加':
-      newButtonColor = 'green';
-      break;
-    default:
-      newButtonColor = buttonColor;
-  }
-  return newButtonColor;
-};
-
-//按钮颜色调节
-const buttonColor = (buttonColor) => {
-  let styleColor = {};
-  switch (buttonColor) {
-    case 'bule':
-      styleColor = { borderColor: '#1890ff', color: '#1890ff' };
-      break;
-    case 'red':
-      styleColor = { borderColor: '#FF5722', color: '#FF5722' };
-      break;
-    case 'green':
-      styleColor = { borderColor: '#66cc00', color: '#66cc00' };
-      break;
-  }
-  return styleColor;
-};
+import { Button, Popconfirm } from 'antd';
+import React, { useMemo } from 'react';
+import { titleColorType, buttonStyle} from './func/initColor';
+import { paramIsset } from '../utils/tools';
+import './index.less';
 
 const WsButton = (props) => {
-  const colorName = titleColor(props.title, props.colorName);
-  const clickFunc = props.onClick===undefined ? ()=>{}:props.onClick; 
+  //基础配置
+  const config = useMemo(() => {
+    let param = {};
+    param.title = paramIsset(props.title, '按钮'); //按钮名称
+    param.onClick = paramIsset(props.onClick, () => { }); //点击事件
+    param.block = paramIsset(props.block, false); //将按钮宽度调整为其父宽度的选项
+    param.disabled = paramIsset(props.disabled, false); //按钮失效状态
+    param.ghost = paramIsset(props.ghost, false); //幽灵属性，使按钮背景透明
+    param.icon = paramIsset(props.icon, ''); //设置按钮的图标组件
+    param.loading = paramIsset(props.loading, false); //设置按钮载入状态
+    param.size = paramIsset(props.size, 'small'); //设置按钮载入状态
+    param.type = paramIsset(props.type, 'default');
+    param.colorType = paramIsset(props.color, titleColorType(props.title));
+    param.pop = paramIsset(props.pop,false);
+    param.popTitle = paramIsset(props.popTitle,'您确定删除选中的数据吗?');
+    param.style = paramIsset(props.style,{}); //自定义样式
+    return param;
+  }, [props])
 
   let html = (
-  <Button
-    type="primary"
-    ghost
-    size="small"
-    style={buttonColor(colorName)}
-    onClick={(event) => {
-      if(props.pop!==true){
-        clickFunc();
-      }
-    }}
-  >
-    {props.title}
-  </Button>
+    <Button
+      type={config.type}
+      size={config.size}
+      style={config.style}
+      icon={config.icon}
+      disabled={config.disabled}
+      block={config.block}
+      loading={config.loading}
+      className={'ws-btn-'+config.colorType}
+      onClick={(event) => {
+        if (config.pop !== true) {
+          config.onClick.call(this,event)
+        }
+      }}
+    >
+      {config.title}
+    </Button>
   );
 
-  if(props.pop===true){
+  if (config.pop === true) {
     html = (
-    <Popconfirm
-        title={props.popTitle===undefined?"您确定删除数据吗?":props.popTitle}
-        onConfirm={()=>{clickFunc()}}
+      <Popconfirm
+        title={config.popTitle}
+        onConfirm={() => { config.onClick.call(this) }}
         // onCancel={cancel}
         okText="确定"
         cancelText="取消"
-    >
-      {html}
-    </Popconfirm>
+      >
+        {html}
+      </Popconfirm>
     )
   }
 
   return (
     <>
-     {html}
+      {html}
     </>
   );
 };

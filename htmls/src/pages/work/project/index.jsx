@@ -1,7 +1,5 @@
 import React, { useState} from 'react';
-import WsForm from '@/components/WsForm';
-import WsTable from '@/components/WsTable';
-import WsButton from '@/components/WsButton'
+import {WsButton,WsForm,WsTable} from '@/components/WsTools';
 import { Space} from 'antd';
 import {getWorkProjectList,addWorkProject,updateWorkProject} from '@/services/api';
 
@@ -24,7 +22,7 @@ const Index = (props) => {
         }
         btns = {
           [
-            {text:'添加',callback:()=>{setFormData({});setFormShow(true);}}
+            {title:'添加',onClick:()=>{setFormData({});setFormShow(true);}}
           ]
         }
         th={[

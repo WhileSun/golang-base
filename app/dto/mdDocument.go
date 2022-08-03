@@ -26,5 +26,5 @@ type DragMdDocumentName struct {
 type UpdateMdDocumentText struct {
 	DocumentId int    `form:"document_id"  binding:"required" label:"ID"`
 	MdText     string `form:"md_text"  binding:"required" label:"文档内容"`
-	HtmlText   string `form:"html_text"  binding:"required" label:"文档内容"`
+	HtmlText   string `form:"html_text"  binding:"" label:"文档内容"`
 }

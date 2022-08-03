@@ -21,6 +21,10 @@ export async function dragMdDocumentName(params){
   return requests.post('md_document_name/drag',params)
 }
 
+export async function uploadDocumentNamePics(params){
+  return requests.postFile('md_document_name/upload_pics',params)
+}
+
 export async function getMdDocumentText(params){
   return requests.post('md_document_text/get',params)
 }
@@ -28,7 +32,6 @@ export async function getMdDocumentText(params){
 export async function updateMdDocumentText(params){
   return requests.post('md_document_text/update',params)
 }
-
 /**书籍管理 */
 export async function getMdBookList(params){
   return requests.post('md_book/list/get',params)

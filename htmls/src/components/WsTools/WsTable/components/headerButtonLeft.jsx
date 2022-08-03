@@ -1,5 +1,5 @@
 import { paramIsset} from '../utils/tools';
-import { Button} from 'antd';
+import WsButton from '../../WsBotton';
 
 const HeaderButtonLeft = (props) => {
 	const btns = paramIsset(props.btns, []);
@@ -13,14 +13,15 @@ const HeaderButtonLeft = (props) => {
 //生成button
 const initBtns = (btn, index) => {
 	return (
-		<Button
-			htmlType="button"
-			onClick={btn.callback}
-			key={index}
-			style={{ marginRight: '10px' }}
-		>
-			{btn.text}
-		</Button>
+		<WsButton
+		type='primary'
+		size="middle"
+		key={index}
+		style={{ marginRight: '10px' }}
+		onClick={btn.onClick}
+		title = {btn.title}
+		color = {btn.color}
+		/>
 	);
 };
 

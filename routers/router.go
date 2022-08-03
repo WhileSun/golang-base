@@ -93,6 +93,7 @@ func InitRouter() *gin.Engine {
 			api.POST("md_document_name/update",  controller.NewMdDocument().UpdateName)
 			api.POST("md_document_name/delete",  controller.NewMdDocument().DeleteName)
 			api.POST("md_document_name/drag",  controller.NewMdDocument().DragName)
+			api.POST("md_document_name/upload_pics", controller.NewMdDocument().UploadPics)
 			api.POST("md_document_text/get",  controller.NewMdDocument().GetText)
 			api.POST("md_document_text/update",  controller.NewMdDocument().UpdateText)
 		}

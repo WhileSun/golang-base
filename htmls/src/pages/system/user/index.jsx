@@ -1,7 +1,5 @@
 import React, { useState, useRef,useMemo, useEffect} from 'react';
-import WsForm from '@/components/WsForm';
-import WsTable from '@/components/WsTable';
-import WsButton from '@/components/WsButton'
+import {WsButton,WsForm,WsTable} from '@/components/WsTools';
 import {breakWords as bw,inArray,loadApi,arrTransName} from '@/utils/tools';
 import { Space} from 'antd';
 import {statusFunc} from '@/module/colorfunc';
@@ -38,7 +36,7 @@ export default (props) => {
         }
         btns = {
           [
-            {text:'添加',callback:()=>{formFunc({});}}
+            {title:'添加',onClick:()=>{formFunc({});}}
           ]
         }
         th={[

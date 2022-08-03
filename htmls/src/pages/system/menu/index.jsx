@@ -1,11 +1,9 @@
 import React, { useState, useRef,useMemo, useEffect} from 'react';
-import WsForm from '@/components/WsForm';
-import WsTable from '@/components/WsTable';
-import WsButton from '@/components/WsButton'
+import {WsButton,WsForm,WsTable} from '@/components/WsTools';
 import {breakWords as bw,inArray,getData,loadApi,toTree,arrTransName} from '@/utils/tools';
 import {statusFunc,menuTypeFunc} from '@/module/colorfunc';
 import { Space} from 'antd';
-import WsIcon from '@/components/WsIcon';
+import {WsIcon} from '@/components/WsTools';
 import {getMenuList,addMenu,updateMenu,deleteMenu,getLoadMenuList,getLoadPermsList} from '@/services/api';
 
 var store = {};
@@ -71,7 +69,7 @@ const Index = (props) => {
         }
         btns = {
           [
-            {text:'添加',callback:()=>{setMenuType(1);formFunc({});}}
+            {title:'添加',onClick:()=>{setMenuType(1);formFunc({});}}
           ]
         }
         th={[

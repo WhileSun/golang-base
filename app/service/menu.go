@@ -190,6 +190,7 @@ func UserRoutesTrans(rows []*models.SMenu, parentId int, menuRoutes []*MenuRoute
 				tMenuRoutes.Path = row.Url
 				tMenuRoutes.Name = row.MenuName
 				tMenuRoutes.Icon = row.Icon
+				tMenuRoutes.HideInMenu = !row.Show
 				PagePerms := make([]string, 0)
 				for _, subRow := range rows {
 					if row.Id == subRow.ParentId && subRow.MenuType == 2 {

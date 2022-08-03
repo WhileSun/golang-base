@@ -43,21 +43,27 @@ const routes = [{
         routes: [
           {
             path: '/daily/md/book',
-            name: '文档书籍',
+            name: '书籍管理',
             component: 'md/book',
           },{
             path: '/daily/md/document/edit',
-            name: '文档内容编辑',
+            name: '书籍编辑',
             component: 'md/document/edit',
             layout:false,
             hideInMenu:true,
           },
           {
             path: '/daily/md/document',
-            name: '文档内容',
+            name: '书籍内容',
             component: 'md/document',
             layout:false,
             hideInMenu:true,
+          },
+          {
+            path: '/daily/md/document1',
+            name: '测试类1',
+            component: 'rule/index',
+            // layout:false,
           },
         ]
       },
@@ -100,12 +106,6 @@ const routes = [{
         name: '修改密码',
         component: 'system/passwd',
       },
-      // {
-      //   icon:'icon-xiugaimima',
-      //   path: '/system/test',
-      //   name: '测试',
-      //   component: 'product/index',
-      // },
       {
         component: './404',
       },

@@ -109,3 +109,14 @@ func (c *MdDocument) UpdateText(req *gin.Context){
 	}
 	e.New(req).Msg(e.SUCCESS)
 }
+
+func (c *MdDocument) UploadPics(req *gin.Context){
+	common := NewCommon()
+	urls,err := common.UploadPics(req,"md_document","image")
+	if err !=nil{
+		gsys.Logger.Error("上传图片失败—>", err.Error())
+		e.New(req).MsgDetail(e.FAILED,"上传图片失败")
+		return
+	}
+	e.New(req).Data(e.SUCCESS,map[string]interface{}{"url":urls})
+}

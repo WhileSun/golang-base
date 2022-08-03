@@ -146,6 +146,7 @@ export const layout = ({initialState}) => {
       margin:'0px',
       backgroundColor: '#fff',
       padding: '15px 10px 0px 15px',
+      display:'relative'
     },
     menu: {
       params: {

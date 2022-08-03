@@ -73,7 +73,7 @@ func (m *SMenu) GeDataPerms(ids []string) []map[string]interface{} {
 }
 
 func (m *SMenu) GetRow(id int) *SMenu {
-	db.Select("id,data_perms,status,menu_type").Where("id = ?", id).Find(m)
+	db.Select("id,data_perms,page_perms,status,menu_type").Where("id = ?", id).Find(m)
 	return m
 }
 

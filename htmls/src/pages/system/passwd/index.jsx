@@ -1,6 +1,6 @@
 import React, { useState} from 'react';
 import {useModel} from 'umi';
-import WsForm from '@/components/WsForm';
+import {WsForm} from '@/components/WsTools';
 import { message } from 'antd';
 import {userOutLogin} from '@/services/user';
 import { loginPath } from '@/config';

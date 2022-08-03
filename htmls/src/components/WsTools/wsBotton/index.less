@@ -1,0 +1,55 @@
+@ws-btn-danger:#ed5565;
+@ws-btn-info:#23c6c8;
+@ws-btn-primary:#1890ff;
+@ws-btn-success:#1ab394;
+@ws-btn-warning:#f8ac59;
+.create-ws-btn-color(@type){
+    .ws-btn{
+        &-@{type}{
+            @ws-btn-color: "ws-btn-@{type}";
+            border-color: @@ws-btn-color;
+            color:@@ws-btn-color;
+            &.ant-btn-primary{
+                background:@@ws-btn-color;
+                border-color:@@ws-btn-color;
+                color:#fff;
+            }
+            &.ant-btn-text{
+                color:@@ws-btn-color;
+                background: transparent;
+                border: transparent;
+            }
+            &.ant-btn-link{
+                color:@@ws-btn-color;
+                background: transparent;
+                border: transparent;
+            }
+        }
+    }
+}
+.ws-btn{
+    &-white{
+        border-color: #d9d9d9;
+        color:#000;
+        &.ant-btn-primary{
+            background:#fff;
+            border-color:#d9d9d9;
+            color:#000;
+        }
+        &.ant-btn-text{
+            color:#000;
+            background: transparent;
+            border: transparent;
+        }
+        &.ant-btn-link{
+            color:#000;
+            background: transparent;
+            border: transparent;
+        }
+    }
+}
+.create-ws-btn-color(danger);
+.create-ws-btn-color(warning);
+.create-ws-btn-color(success);
+.create-ws-btn-color(info);
+.create-ws-btn-color(primary);

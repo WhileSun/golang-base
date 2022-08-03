@@ -1,7 +1,5 @@
 import React, { useState, useRef,useMemo, useEffect} from 'react';
-import WsForm from '@/components/WsForm';
-import WsTable from '@/components/WsTable';
-import WsButton from '@/components/WsButton'
+import {WsTable,WsForm,WsButton} from '@/components/WsTools'
 import {loadApi} from '@/utils/tools';
 import { Space} from 'antd';
 import { history, Link } from 'umi';
@@ -32,7 +30,7 @@ export default (props) => {
         }
         btns = {
           [
-            {text:'添加',callback:()=>{formFunc({});}}
+            {title:'添加',onClick:()=>{formFunc({});}}
           ]
         }
         th={[

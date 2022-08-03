@@ -1,28 +1,26 @@
 import './index.less';
-import $ from 'jquery';
-import { Table, Form, message, Button, Tooltip} from 'antd';
+import { Table, Form, message, Button, Tooltip, Pagination } from 'antd';
 import React, { useState, useEffect, useMemo, useRef, useImperativeHandle } from 'react';
 import { SettingOutlined, ReloadOutlined, SearchOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { paramIsset, getRandStr, toTree, parseFormParams, setFormParamStore, arrayColumn, filterName } from './utils/tools';
 import useTable from './hooks/useTable';
-import { WsModal } from '@/components/WsTools';
+import WsModal from '../WsModal';
 import HeaderSearchForm from './components/headerSearchForm';
 import HeaderButtonLeft from './components/headerButtonLeft';
 import ColumnShowButton from './components/columnShowButton';
 import initColumnFunc from './func/initColumn';
 import initShowColumnFunc from './func/initShowColumn';
-import {normalResize,modalResize} from './func/initTableTool';
 const WsTable = (props, ref) => {
+
   const [formRef] = Form.useForm();
-  
   //父级设置配置
   const config = useMemo(() => {
     let param = {};
     param.th = paramIsset(props.th); //列表展示字段
-    param.size =  paramIsset(props.size, 'small'); //尺寸
-    param.rowKey =paramIsset(props.rowKey, 'id'); //主键ID，选中返回的参数
+    param.size = paramIsset(props.size, 'small'); //尺寸
+    param.rowKey = paramIsset(props.rowKey, 'id'); //主键ID，选中返回的参数
     param.display = paramIsset(props.display, 'fixed'); //展示方式fixed:固定高度;fluid:不固定
-    param.api = paramIsset(props.api, new Promise((vals)=>{})); //promise api
+    param.api = paramIsset(props.api, new Promise((vals) => { })); //promise api
     param.mode = paramIsset(props.mode, 'normal'); //模式: normal modal
     param.checkboxField = paramIsset(props.checkbox, false); //是否开启选择框
     param.treeTable = paramIsset(props.treeTable, false); //tree table开启
@@ -36,15 +34,15 @@ const WsTable = (props, ref) => {
     param.otherFormParams = props.params; //额外参数
     param.onLocalFilter = props.onLocalFilter; //对本地数据筛选
 
-    param.page =  paramIsset(props.page, 1); //第几页
-    param.pageSize =  paramIsset(props.pageSize, 50); //每页数
+    param.page = paramIsset(props.page, 1); //第几页
+    param.pageSize = paramIsset(props.pageSize, 50); //每页数
     return param;
   }, [props]);
 
   const [apiresp, setApiresp] = useState({}); //api原生数据
   const [apiData, setApiData] = useState([]); //api经过内部转化数据
   const [loading, setLoading] = useState(false);
-  const [checkedIds,setCheckedIds] = useState([]); //表格选中的ID
+  const [checkedIds, setCheckedIds] = useState([]); //表格选中的ID
   const [modalShow, setModalShow] = useState(paramIsset(props.modalShow, true)); //弹出框是否显示
   //tree table
   const [expandedRowKeys, setExpandedRowKeys] = useState([]); //展开的节点ID
@@ -56,11 +54,11 @@ const WsTable = (props, ref) => {
   const [searchFormShow, setSearchFormShow] = useState(true); //是否显示搜索框
   //table column等配置信息
   const tableSetting = useMemo(() => {
-    return initColumnFunc(config.th, config.display, showColumns)
+    return initColumnFunc(config.th, showColumns)
   }, [showColumns]);
 
   /**查询参数整合 */
-  const defaultFormParams = { 'pageSize': config.pageSize, 'page': config.page, ...config.otherFormParams}; //默认参数
+  const defaultFormParams = { 'pageSize': config.pageSize, 'page': config.page, ...config.otherFormParams }; //默认参数
   const [formParams, setFormParams] = useState(defaultFormParams);
   const setFormParamsFunc = (newParam, mode = "") => {
     let params = {};
@@ -133,7 +131,7 @@ const WsTable = (props, ref) => {
 
   const getData = async (apiParams = {}) => {
     setLoading(true);
-    config.api.call(this,apiParams).then(function (resp) {
+    config.api.call(this, apiParams).then(function (resp) {
       console.log('resp', resp);
       setApiresp(resp);
       setApiData(transTableData(resp.data));
@@ -220,32 +218,6 @@ const WsTable = (props, ref) => {
     )
   }, [searchFormShow, showColumns, treeTableshow, rowKeys])
 
-  useEffect(() => {
-    if (config.display == 'fixed') {
-      normalResize(config.divId, config.footHeight);
-    }
-  }, [searchFormShow]);
-
-  //界面自适应
-  useEffect(() => {
-    if (config.display == 'fixed') {
-      if (config.mode == 'normal') {
-        function resize() {
-          normalResize(config.divId, config.footHeight)
-        }
-        $(window).on('resize', resize);
-        return () => {
-          console.log('clear');
-          $(window).off('resize', resize);
-        }
-      } else if (config.mode == 'modal') {
-        setTimeout(() => {
-          modalResize(config.divId, config.footHeight);
-        }, 10);
-      }
-    }
-  }, []);
-
   //映射ref函数
   var tableInstance = useTable(props.table);
   tableInstance.reload = () => { tableReload(); };
@@ -263,65 +235,68 @@ const WsTable = (props, ref) => {
 
   const tableHtml = (
     <>
-      <div className={config.divId + " ws-table"}>
-        <div className="ws-table-header">
-          <div className="header-search-form" style={{ display: searchFormShow ? "block" : 'none' }}>
-            {headerSearchForm}
+      <div style={{ position: 'relative', height: '100%' }}>
+        <div className={config.divId + " ws-table " + (config.display == 'fixed' ? 'ws-table-fixed' : '')}>
+          <div className="ws-table-header">
+            <div className="header-search-form" style={{ display: searchFormShow ? "block" : 'none' }}>
+              {headerSearchForm}
+            </div>
+            <div className="header-button">
+              <div>{headerButtonLeft}</div>
+              <div>{headerButtonRight}</div>
+            </div>
           </div>
-          <div className="header-button">
-            <div>{headerButtonLeft}</div>
-            <div>{headerButtonRight}</div>
+          <div className="ws-table-container">
+            <Table
+              ref={props.ref}
+              rowSelection={config.checkboxField ? {
+                type: 'checkbox',
+                onChange: (selectedRowKeys) => {
+                  setCheckedIds(selectedRowKeys);
+                }
+              } : ""}
+              columns={tableSetting.columns}
+              dataSource={apiData}
+              bordered={true}
+              size={config.size}
+              rowKey={config.rowKey}
+              scroll={tableSetting.tableScroll}
+              loading={loading}
+              showSizeChanger={false}
+              // expandRowByClick={true}
+              onExpandedRowsChange={(expandedRows) => {
+                setExpandedRowKeys(expandedRows);
+              }}
+              expandedRowKeys={expandedRowKeys}
+              pagination={false}
+            // onChange={(paginate, filters, sorter, extra) => {
+            //   if (extra.action === 'paginate') {
+            //     tableChangePage(paginate.current);
+            //   }
+            // }}
+            // onRow={(record, index) => {
+            //   return {
+            //     onClick: event => {
+            //       // console.log(event);
+            //       if (event.target.dataset.act !== undefined && props.rowBtnsClick !== undefined) {
+            //         props.rowBtnsClick(event.target.dataset.act, record);
+            //       }
+            //     },
+            //   };
+            // }}
+            />
           </div>
-        </div>
-        <div className="ws-table-container">
-          <Table
-            ref={props.ref}
-            rowSelection={config.checkboxField ? {
-              type: 'checkbox',
-              onChange: (selectedRowKeys) => {
-                setCheckedIds(selectedRowKeys);
-              }
-            } : ""}
-            columns={tableSetting.columns}
-            dataSource={apiData}
-            bordered={true}
-            size={config.size}
-            rowKey={config.rowKey}
-            scroll={tableSetting.tableScroll}
-            loading={loading}
-            showSizeChanger={false}
-            // expandRowByClick={true}
-            onExpandedRowsChange={(expandedRows) => {
-              setExpandedRowKeys(expandedRows);
-            }}
-            expandedRowKeys={expandedRowKeys}
-            pagination={{
-              position: ['bottomRight'],
-              pageSize: formParams.pageSize,
-              total: apiresp.totalSize,
-              pageSizeOptions: [],
-              current: formParams.page,
-              size: 'small',
-              showTotal: (total) => {
-                return `共 ${total} 条`;
-              },
-            }}
-            onChange={(paginate, filters, sorter, extra) => {
-              if (extra.action === 'paginate') {
-                tableChangePage(paginate.current);
-              }
-            }}
-          // onRow={(record, index) => {
-          //   return {
-          //     onClick: event => {
-          //       // console.log(event);
-          //       if (event.target.dataset.act !== undefined && props.rowBtnsClick !== undefined) {
-          //         props.rowBtnsClick(event.target.dataset.act, record);
-          //       }
-          //     },
-          //   };
-          // }}
-          />
+          <div className="ws-table-footer">
+            <Pagination
+              size='small'
+              current={formParams.page}
+              pageSize={formParams.pageSize}
+              showSizeChanger={false}
+              total={apiresp.total}
+              showTotal={total => `共 ${total} 条`}
+              onChange={(page, pageSize) => { tableChangePage(page) }}
+            />
+          </div>
         </div>
       </div>
     </>

@@ -24,11 +24,10 @@ const filterIndex = (record, dataIndex, value) => {
 /**
  * 初始化column
  * @param {Array} fields table的字段
- * @param {String} display table展示方式
  * @param {Array} showColumns table展示的字段
  * @returns 
  */
-const initColumnFunc = (fields, display, showColumns) => {
+const initColumnFunc = (fields, showColumns) => {
   console.log('initColumn');
   var columns = [];
   var sumWidth = 0;
@@ -130,11 +129,7 @@ const initColumnFunc = (fields, display, showColumns) => {
   columns.push({});
   sumWidth += 0;
   //设置table宽高
-  if (display == 'fixed') {
-    tableScroll = { x: sumWidth, y: 2000 };
-  } else {
-    tableScroll = { x: sumWidth, y: 5000 };
-  }
+  tableScroll = { x: sumWidth, y: 5000 };
   return { 'columns': columns, 'tableScroll': tableScroll };
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PlusOutlined, DeleteOutlined, FormOutlined, MenuOutlined} from '@ant-design/icons';
 import { Tree, Button, Tabs,Tooltip} from 'antd';
 import './index.less';
-import WsForm from '@/components/WsForm';
+import {WsForm} from '@/components/WsTools';
 import { toTree, loadApi, transTree, getTreeKeys } from '@/utils/tools';
 import { getMdDocumentNameList, addMdDocumentName, updateMdDocumentName, deleteMdDocumentName, dragMdDocumentName } from '@/services/api';
 import { WsModal } from '@/components/WsTools';
@@ -96,7 +96,7 @@ const MenuTree = (props) => {
                 selectedKeys={[props.documentId.toString()]}
                 onSelect={onSelect}
                 treeData={treeData}
-                titleRender={(dom) => { return <div style={{ height: '30px', lineHeight: '30px' }}>{dom.title}</div> }}
+                titleRender={(dom) => { return <div style={{ height: '30px', lineHeight: '30px',overflow: 'hidden'}}>{dom.title}</div> }}
                 onRightClick={({ event, node }) => {
                   setTreeNode(node);
                   setUlShow(true)
