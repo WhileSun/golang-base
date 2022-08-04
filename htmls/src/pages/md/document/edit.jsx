@@ -5,7 +5,6 @@ import MenuTree from './components/menutree';
 import { updateMdDocumentText, getMdDocumentText,uploadDocumentNameFile} from '@/services/api';
 import { loadApi, getDefualtValue } from '@/utils/tools';
 import { history } from 'umi';
-import './index.less';
 import {WsMdEditor} from '@/components/WsTools';
 
 const editorId = 'my-editor';
