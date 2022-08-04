@@ -80,7 +80,7 @@ const WsModal = (props) => {
         getContainer={false}
         forceRender={config.forceRender}
         wrapClassName={config.fullVisible && fullStatus ? "wsmodel-wrap-style wsmodal-wrap-fullscreen" : "wsmodel-wrap-style"}
-        bodyStyle={{ maxHeight: ($(window).height() - 180) + 'px', overflowY: "auto", padding: "5px 15px" }}
+        bodyStyle={{ maxHeight: ($(window).height() - 180) + 'px', overflowY: "auto", padding: "10px 15px" }}
         // style={{ top: 70 }}
         title={
           <div

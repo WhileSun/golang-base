@@ -4,6 +4,7 @@ import WsButton from './WsBotton';
 import WsTable  from './WsTable';
 import WsForm   from './WsForm';
 import WsIcon from './WsIcon';
+import WsMdEditor from './WsMdEditor';
 import { forwardRef, useState, useEffect } from 'react';
 import $ from 'jquery';
 import ReactDOM from 'react-dom';
@@ -60,4 +61,4 @@ const modalConfirm = (config) => {
 
 WsModal.confirm = modalConfirm;
 
-export { WsModal, WsDrawer, WsButton, WsTable, WsForm, WsIcon};
+export { WsModal, WsDrawer, WsButton, WsTable, WsForm, WsIcon, WsMdEditor};

@@ -10,13 +10,15 @@ import {
   Radio,
   Tree,
   Checkbox,
-  Transfer
+  Transfer,
+  Upload,
+  Button
 } from 'antd';
-import { LockOutlined } from '@ant-design/icons';
+import { LockOutlined,UploadOutlined} from '@ant-design/icons';
 import MdEditor from './mdEditor';
 const { Option } = Select;
 const { TextArea } = Input;
-import { delArrVal,paramIsset, createFormRules, formFieldTrans } from '../utils/tools';
+import { delArrVal,paramIsset, createFormRules, formFieldTrans,loadPromise} from '../utils/tools';
 import React, { useState} from 'react';
 
 const ItemField = (props) => {
@@ -254,6 +256,27 @@ const ItemField = (props) => {
       render={item => item.title}
     />)
 
+  }else if(field.compoType == 'uploadFile'){
+    const customRequest = (customData)=>{
+      const param = new FormData();
+      param.append(paramIsset(field.uploadName,'file'), customData.file);
+      loadPromise(field.customRequest,param,(data)=>{
+       field.customRequestSucc===undefined? customData.onSuccess(data):field.customRequestSucc.call(this,data,customData);
+      },(error)=>{
+        customData.onError(error);
+      });
+    }
+    htmls = (<Upload
+      action={field.action}
+      name = {paramIsset(field.uploadName,'file')}
+      multiple={paramIsset(field.multiple,false)}
+      beforeUpload = {field.beforeUpload}
+      onChange = {field.onChange}
+      customRequest = {field.customRequest===undefined || field.customRequest==''?'':customRequest}
+      {...paramIsset(field.props,{})}
+    >
+      <Button icon={<UploadOutlined />}>Upload</Button>
+    </Upload>)
   }
 
   if (field.compoType !== 'br') {

@@ -4,7 +4,8 @@ import useForm from './hooks/useForm';
 import ItemField from './components/itemField';
 import { paramIsset, validateMessages, formValueClean, formFieldsTrans, getFieldToObj } from './utils/tools';
 import { Form, Row, Col, Button, message } from 'antd';
-import { WsModal, WsDrawer } from '@/components/WsTools';
+import WsModal from '../WsModal';
+import WsDrawer from '../WsDrawer';
 
 
 const WsForm = (props, ref) => {
@@ -26,6 +27,7 @@ const WsForm = (props, ref) => {
     param.onCancel = props.onCancel; //关闭执行
     param.onSucc = props.onSucc; //成功后回调
     param.onBeforeSubmit = props.onBeforeSubmit; //提交前回调
+    param.onSelfSubmit = props.onSelfSubmit; //自己处理
 
     param.title = paramIsset(props.title, ''); //弹出框标题
     param.width = paramIsset(props.width, 600); //弹出框宽度
@@ -36,11 +38,9 @@ const WsForm = (props, ref) => {
   }, [props])
 
   const [loading, setLoading] = useState(false); //加载状态
-  const [modelVisible, setModelVisible] = useState(paramIsset(props.modelVisible, true));//弹出框是否显示
 
   //弹出框关闭事件
   const closePopFunc = () => {
-    setModelVisible(false);
     if (config.onCancel) { config.onCancel() };
   }
 
@@ -72,6 +72,12 @@ const WsForm = (props, ref) => {
     if (config.updateForm) {
       params[config.idKey] = config.initData[config.idKey];
     }
+    if(config.onSelfSubmit){
+      config.onSelfSubmit.call(this, params,()=>{
+        closePopFunc();
+      });
+      return;
+    }
     if (config.onBeforeSubmit) {
       config.onBeforeSubmit.call(this, params, () => {
         getData(params);
@@ -88,7 +94,6 @@ const WsForm = (props, ref) => {
   }, []);
 
   var formInstance = useForm(props.form);
-  formInstance.setModelVisible = () => { }
   //支持原生ref
   useImperativeHandle(ref, () => { return formInstance });
 
@@ -125,7 +130,7 @@ const WsForm = (props, ref) => {
     return (
       <WsModal
         content={formHtml}
-        visible={modelVisible}
+        visible={true}
         width={config.width}
         fullVisible={true}
         fullStatus={config.fullStatus}
@@ -147,7 +152,7 @@ const WsForm = (props, ref) => {
     return (
       <WsDrawer
         content={formHtml}
-        show={modelVisible}
+        show={true}
         width={config.width}
         fullStatus={config.fullStatus}
         title={config.updateForm ? "编辑" + config.title : "添加" + config.title}

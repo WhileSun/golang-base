@@ -23,12 +23,16 @@ const MenuTree = (props) => {
 
   const getInitDocumentList = (init = false) => {
     loadApi(getMdDocumentNameList, { book_id: book_id }, (data) => {
+      let menuList = data?.menuList;
       if (init) {
-        if (data.length > 0 && props.documentId == 0) {
-          props.setDocumentId(data[0]['id']);
+        if (menuList.length > 0 && props.documentId == 0) {
+          props.setDocumentId(menuList[0]['id']);
         }
       }
-      setTreeData(transTree(toTree(data), 'document_name', 'id'));
+      if(props.setBookName){
+        props.setBookName(data?.book?.book_name);
+      }
+      setTreeData(transTree(toTree(menuList), 'document_name', 'id'));
     });
   }
 

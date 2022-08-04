@@ -63,11 +63,15 @@ const Index = () => {
           {name:"supplier_contract_name",title:'供应商合同名称',width:200,render:v=>{return v||'-'}},
         ]}
         api={() => {
-          return Promise.resolve({
-            code: 0,
-            data: datas,
-            msg: '',
-            total:100,
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve({
+                code: 0,
+                data: datas,
+                msg: '',
+                total:100,
+              });
+            }, 1000);
           });
         }}
       />

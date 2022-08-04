@@ -21,8 +21,8 @@ export async function dragMdDocumentName(params){
   return requests.post('md_document_name/drag',params)
 }
 
-export async function uploadDocumentNamePics(params){
-  return requests.postFile('md_document_name/upload_pics',params)
+export async function uploadDocumentNameFile(params){
+  return requests.postFile('md_document_name/upload_file',params)
 }
 
 export async function getMdDocumentText(params){

@@ -124,6 +124,24 @@ const delArrVal = (arr, val)=>{
   return arr;
 }
 
+const loadPromise = (api,params,callback,onError)=>{
+  return api.call(this,params).then((resp)=>{
+    if(resp.code ==0){
+        if(callback){
+            return callback(resp.data);
+        }
+    }else{
+      if(onError){
+        onError(resp.msg)
+      }
+    }
+}).catch(function(error){
+  if(onError){
+    onError(error)
+  }
+});
+}
+
 export {
   paramIsset,
   createFormRules,
@@ -134,6 +152,6 @@ export {
   getFieldToObj,
   formFieldTrans,
   validateMessages,
-
+  loadPromise,
   delArrVal,
 };

@@ -235,7 +235,7 @@ const WsTable = (props, ref) => {
 
   const tableHtml = (
     <>
-      <div style={{ position: 'relative', height: '100%' }}>
+      <div style={{ position: 'relative', height: '100%',minWidth:'0px'}}>
         <div className={config.divId + " ws-table " + (config.display == 'fixed' ? 'ws-table-fixed' : '')}>
           <div className="ws-table-header">
             <div className="header-search-form" style={{ display: searchFormShow ? "block" : 'none' }}>

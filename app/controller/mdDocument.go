@@ -21,7 +21,8 @@ func NewMdDocument() *MdDocument{
 
 func (c *MdDocument) GetNameList(req *gin.Context){
 	rows := models.NewMdDocument().GetNameList(req)
-	e.New(req).Data(e.SUCCESS, rows)
+	info := models.NewMdBook().GetInfo(gconvert.StrToInt(req.PostForm("book_id")))
+	e.New(req).Data(e.SUCCESS,map[string]interface{}{"book":info,"menuList":rows})
 }
 
 func (c *MdDocument) AddName(req *gin.Context){
@@ -110,13 +111,13 @@ func (c *MdDocument) UpdateText(req *gin.Context){
 	e.New(req).Msg(e.SUCCESS)
 }
 
-func (c *MdDocument) UploadPics(req *gin.Context){
+func (c *MdDocument) UploadFile(req *gin.Context){
 	common := NewCommon()
-	urls,err := common.UploadPics(req,"md_document","image")
+	url,err := common.UploadFile(req,"md_document","file")
 	if err !=nil{
-		gsys.Logger.Error("上传图片失败—>", err.Error())
-		e.New(req).MsgDetail(e.FAILED,"上传图片失败")
+		gsys.Logger.Error("上传失败—>", err.Error())
+		e.New(req).MsgDetail(e.FAILED,"上传失败")
 		return
 	}
-	e.New(req).Data(e.SUCCESS,map[string]interface{}{"url":urls})
+	e.New(req).Data(e.SUCCESS,map[string]interface{}{"url":url})
 }
