@@ -1,11 +1,11 @@
 import React, { useState, useRef,useMemo, useEffect} from 'react';
 import {WsButton,WsForm,WsTable} from '@/components/WsTools';
-import {breakWords as bw,inArray,getData,toTree} from '@/utils/tools';
+import {breakWords as bw,inArray,getData,toTree,loadApi} from '@/utils/tools';
 import { Space,message,Tag } from 'antd';
 import {statusFunc} from '@/module/colorfunc';
 import { FileOutlined,FolderOutlined} from '@ant-design/icons';
 import {roleSuperName} from "@/config"
-import {getRoleList,addRole,updateRole} from "@/services/api";
+import {getRoleList,addRole,updateRole,getMenuNameList} from "@/services/api";
 
 var store = {};
 export default (props) => {
@@ -19,7 +19,7 @@ export default (props) => {
 
   const formFunc = (row)=>{
     setFormData(row)
-    getData('load/menu/list/get',{},(data)=>{
+    loadApi(getMenuNameList,{},(data)=>{
       const permsTrans = (rows)=>{
         return rows.map((row)=>{
           if(row['status']){

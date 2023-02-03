@@ -4,14 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/whilesun/go-admin/app/dto"
 	"github.com/whilesun/go-admin/app/models"
-	"github.com/whilesun/go-admin/pkg/gsys"
+	dto2 "github.com/whilesun/go-admin/app/types/dto"
+	gsys2 "github.com/whilesun/go-admin/gctx"
 	"github.com/whilesun/go-admin/pkg/utils/gconvert"
 )
 
 type WorkProject struct {
-
 }
 
 func NewWorkProject() *WorkProject {
@@ -25,33 +24,33 @@ func (s *WorkProject) checkProjectNameExist(projectName string) error {
 	return nil
 }
 
-func (s *WorkProject) Add(params dto.AddWorkProject,req *gin.Context) error{
+func (s *WorkProject) Add(params dto2.AddWorkProject, req *gin.Context) error {
 	workProjectModel := models.NewWorkProject()
 	gconvert.StructCopy(params, workProjectModel)
 	workProjectModel.CreaterId = req.GetInt("userId")
 	if err := NewWorkProject().checkProjectNameExist(workProjectModel.ProjectName); err != nil {
 		return err
 	}
-	if err := workProjectModel.Add();err !=nil{
-		gsys.Logger.Error("添加工作项目失败—>", err.Error())
+	if err := workProjectModel.Add(); err != nil {
+		gsys2.Logger.Error("添加工作项目失败—>", err.Error())
 		return errors.New("添加工作项目失败！")
 	}
 	return nil
 }
 
-func (s *WorkProject) Update(params dto.UpdateWorkProject) error{
+func (s *WorkProject) Update(params dto2.UpdateWorkProject) error {
 	oldWorkProjectModel := models.NewWorkProject()
 	oldWorkProjectModel.GetInfo(params.Id)
 
 	workProjectModel := models.NewWorkProject()
 	gconvert.StructCopy(params, workProjectModel)
-	if oldWorkProjectModel.ProjectName != workProjectModel.ProjectName{
+	if oldWorkProjectModel.ProjectName != workProjectModel.ProjectName {
 		if err := NewWorkProject().checkProjectNameExist(workProjectModel.ProjectName); err != nil {
 			return err
 		}
 	}
-	if err := workProjectModel.Update();err !=nil{
-		gsys.Logger.Error("修改工作项目失败—>", err.Error())
+	if err := workProjectModel.Update(); err != nil {
+		gsys2.Logger.Error("修改工作项目失败—>", err.Error())
 		return errors.New("修改工作项目失败！")
 	}
 	return nil

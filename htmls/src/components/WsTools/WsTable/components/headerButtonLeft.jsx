@@ -1,5 +1,5 @@
 import { paramIsset} from '../utils/tools';
-import WsButton from '../../WsBotton';
+import WsButton from '../../WsButton';
 
 const HeaderButtonLeft = (props) => {
 	const btns = paramIsset(props.btns, []);

@@ -4,7 +4,7 @@ import {breakWords as bw,inArray,loadApi,arrTransName} from '@/utils/tools';
 import { Space} from 'antd';
 import {statusFunc} from '@/module/colorfunc';
 import {defaultPasswd,userSuperName} from '@/config';
-import {getUserList,getLoadRoleList,addUser,updateUser} from '@/services/api';
+import {getUserList,getRoleNameList,addUser,updateUser} from '@/services/api';
 
 var store = {};
 export default (props) => {
@@ -17,7 +17,7 @@ export default (props) => {
 
   const formFunc = (row)=>{
     setFormData(row)
-    loadApi(getLoadRoleList,{},(data)=>{
+    loadApi(getRoleNameList,{},(data)=>{
       setRoleSerachSelect(arrTransName(data,{role_name:'label',id:'value'}));
       setFormShow(true);
     })

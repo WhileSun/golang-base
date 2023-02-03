@@ -3,20 +3,37 @@ log:
   stdout: true
   LogLevel: 5
 redis:
-  password: 666666
   server: 127.0.0.1:6379
+  password: 123456!
   maxActive: 20
   maxIdle: 5
+redis1:
+  server: 127.0.0.1:6379
+  password: 123456!
+  maxActive: 20
+  maxIdle: 5
+  select: 1
 database:
   type: postgres
   host: 127.0.0.1
   port: 5432
   user: postgres
-  password: lingweiqu
+  password: 123456!
   name: tshop_go
   maxIdleConn: 5
   maxOpenConn: 20
-  Log: false
+  log: true
+  dbLog:
+    stdout: true
+    FileName: db
+captcha:
+  length: 6
+  height: 80
+  width: 240
+jwt:
+  Secret: golang_gin_react
+  exp: 1800
+  lastexp: 3600
 loginSetting:
   # sessions设置
   aesKey: EfoBjp9cQtjaEVGiQUu8RsXqW5dRrLGS

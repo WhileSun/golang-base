@@ -11,6 +11,10 @@ export async function userOutLogin() {
   return requests.logout();
 }
 
+export async function updateUserPasswd(params){
+  return requests.post('user/passwd/update',params);
+}
+
 /**获取用户信息 */
 export async function getUserInfo() {
   return requests.get('user/info/get');
@@ -22,7 +26,7 @@ export async function getUserRouteList(){
 }
 
 export async function getUserList(params){
-  return requests.post('user/list/get',params);
+  return requests.post('user/list',params);
 }
 
 export async function addUser(params){

@@ -4,7 +4,7 @@ import {breakWords as bw,inArray,getData,loadApi,toTree,arrTransName} from '@/ut
 import {statusFunc,menuTypeFunc} from '@/module/colorfunc';
 import { Space} from 'antd';
 import {WsIcon} from '@/components/WsTools';
-import {getMenuList,addMenu,updateMenu,deleteMenu,getLoadMenuList,getLoadPermsList} from '@/services/api';
+import {getMenuList,addMenu,updateMenu,deleteMenu,getMenuNameList,getPermsNameList} from '@/services/api';
 
 var store = {};
 
@@ -33,13 +33,13 @@ const Index = (props) => {
   const MenuTypeList = {1:'菜单',2:'节点'};
   
   const getInitMenuList = (cb)=>{
-    loadApi(getLoadMenuList,{menu_type:1},(data)=>{
+    loadApi(getMenuNameList,{menu_type:1},(data)=>{
       setMenuTreeSelect(toTree(data));
       cb;
     });
   }
   const getInitPermsList = (cb)=>{
-    loadApi(getLoadPermsList,{},(data)=>{
+    loadApi(getPermsNameList,{},(data)=>{
       setPermsList(arrTransName(data,{name:'title',page_perms:'key'}));
       cb;
     });

@@ -1,6 +1,6 @@
 import WsModal from './WsModal';
 import WsDrawer from './WsDrawer';
-import WsButton from './WsBotton';
+import WsButton from './WsButton';
 import WsTable  from './WsTable';
 import WsForm   from './WsForm';
 import WsIcon from './WsIcon';

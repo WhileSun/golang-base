@@ -3,12 +3,12 @@ import { request } from 'umi';
 
 /**获取验证码 */
 export async function getCaptcha() {
-  return requests.get('sys/loginCaptcha/get');
+  return requests.get('sys/captcha/get');
 }
 
 /**角色管理 */
 export async function getRoleList(params) {
-  return requests.post('role/list/get',params);
+  return requests.post('role/list',params);
 }
 
 export async function addRole(params){
@@ -21,7 +21,7 @@ export async function updateRole(params){
 
 /**菜单管理 */
 export async function getMenuList(params){
-  return requests.post('menu/list/get',params);
+  return requests.post('menu/list',params);
 }
 
 export async function addMenu(params){
@@ -38,7 +38,7 @@ export async function deleteMenu(params){
 
 /**节点管理 */
 export async function getPermsList(params){
-  return requests.post('perms/list/get',params);
+  return requests.post('perms/list',params);
 }
 
 export async function addPerms(params){

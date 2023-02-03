@@ -1,12 +1,13 @@
 package models
 
-import "github.com/whilesun/go-admin/app/po"
+import (
+	po2 "github.com/whilesun/go-admin/app/types/po"
+)
 
 type SSetting struct {
-	po.SSetting
+	po2.SSetting
 }
 
 func NewSetting() *SSetting {
 	return &SSetting{}
 }
-

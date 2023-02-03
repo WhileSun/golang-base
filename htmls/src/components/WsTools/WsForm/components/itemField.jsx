@@ -299,7 +299,6 @@ const ItemField = (props) => {
       </Form.Item>
     );
   }
-
   return (
     <Col
       span={field.col === undefined ? 12 : Number(field.col)}

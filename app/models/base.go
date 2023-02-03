@@ -1,16 +1,14 @@
 package models
 
 import (
-	"github.com/whilesun/go-admin/pkg/gsys"
+	gsys2 "github.com/whilesun/go-admin/gctx"
 	"gorm.io/gorm"
 )
 
 var (
-	db     *gorm.DB
+	db *gorm.DB
 )
 
 func init() {
-	db = gsys.Db
+	db = gsys2.Db
 }
-
-

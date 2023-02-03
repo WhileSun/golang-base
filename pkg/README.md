@@ -22,6 +22,8 @@
 
 go test -v -run TestDb go_test.go
 go clean -testcache
+
+
 ### gconf-读取配置包
 - 采用viper插件包，目前自动读取根目录下config/config.yaml文件
 - 使用方法

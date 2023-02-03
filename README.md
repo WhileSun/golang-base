@@ -1,3 +1,5 @@
+# Golang + React
+
 ## 结构目录
 gin
 ```
@@ -18,10 +20,19 @@ gin
 |—main.go           入口文件
 ```
 
-## sql 转化成struct工具
+## 项目介绍
+系统登录采用jwt模式，附带续期
+
+## 使用的技术栈
+
+### air 自动重载代码
+- https://github.com/cosmtrek/air
+- go install github.com/cosmtrek/air@latest
+
+### sql 转化成struct工具
 - https://github.com/WhileSun/db2go
 - pgsqltrans.exe -host=127.0.0.1 -port=5432 -uname=postgres -pwd=lingweiqu -dbname=go_oms
 
-## swagger  生成API文档
+### swagger  生成API文档
 - go get -u github.com/swaggo/swag/cmd/swag
 - swag init

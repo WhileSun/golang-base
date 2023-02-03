@@ -1,6 +1,6 @@
 import { extend  } from 'umi-request';
 import { history } from 'umi';
-import {getToken,deleteToken} from "@/token"
+import {getToken,deleteToken,setToken} from "@/token"
 import {loginPath,AUTH_FAIL} from '@/config'
 import { message } from 'antd';
 const request = extend({
@@ -21,10 +21,17 @@ request.interceptors.request.use(async (url, options) => {
 })
 
 request.interceptors.response.use(async response => {
+    //重新续期
+    let newtoken = response.headers.get("newtoken")
+    console.log(newtoken);
+    if(newtoken != null){
+        setToken(newtoken)
+    }
     const resp = await response.clone().json();
     if(resp.code == AUTH_FAIL){
         //失效先删除
         deleteToken();
+        message.success('请您重新登录');
         history.push(loginPath);
     }
     return response;
@@ -58,6 +65,7 @@ const requests = {
         );
     },
     logout(){
+        message.success('请您重新登录');
         deleteToken();
     }
 }
